@@ -1,0 +1,12 @@
+{
+  "$schema": "https://railway.app/standard-schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "cron": "0 3 * * *",
+    "startCommand": "python deploy_new_year.py",
+    "restartPolicyType": "NEVER",
+    "healthcheckPath": null
+  }
+}
