@@ -30,16 +30,16 @@ ALL_LISTS = ALL_FREE + PAID_HIGH
 # --- CAMPAIGN MAPPING ---
 # Logic: Map the current date to the Template Alias and specific CSV paths
 CAMPAIGN_MAP = {
-    "2025-12-28": {"template": "ny-gift-day-1", "lists": ALL_LISTS},
-    "2025-12-29": {"template": "xmas-day-2", "lists": [FREE_MAY]},
-    "2025-12-30": {"template": "xmas-day-2", "lists": [FREE_APRIL, FREE_JULY]},
-    "2025-12-31": {"template": "nye-countdown-day-4", "lists": [FREE_JULY] + PAID_HIGH},
-    "2026-01-01": {"template": "xmas-day-4", "lists": [FREE_APRIL, FREE_MAY]},
-    "2026-01-02": {"template": "xmas-day-4", "lists": [FREE_JUNE, FREE_JULY]},
-    "2026-01-03": {"template": "ny-gift-2-day-7", "lists": ALL_LISTS},
-    "2026-01-04": {"template": "token-multiplier-day-8", "lists": [FREE_JUNE] + PAID_HIGH},
-    "2026-01-05": {"template": "multiplier-urgency-day-9", "lists": PAID_HIGH},
-    "2026-01-06": {"template": "final-call-day-10", "lists": [FREE_JULY] + PAID_HIGH},
+    "2025-12-29": {"template": "ny-gift-day-1", "lists": ALL_LISTS},
+    "2025-12-30": {"template": "xmas-day-2", "lists": [FREE_MAY]},
+    "2025-12-31": {"template": "xmas-day-2", "lists": [FREE_APRIL, FREE_JULY]},
+    "2026-01-01": {"template": "nye-countdown-day-4", "lists": [FREE_JULY] + PAID_HIGH},
+    "2026-01-02": {"template": "xmas-day-4", "lists": [FREE_APRIL, FREE_MAY]},
+    "2026-01-03": {"template": "xmas-day-4", "lists": [FREE_JUNE, FREE_JULY]},
+    "2026-01-04": {"template": "ny-gift-2-day-7", "lists": ALL_LISTS},
+    "2026-01-05": {"template": "token-multiplier-day-8", "lists": [FREE_JUNE] + PAID_HIGH},
+    "2026-01-06": {"template": "multiplier-urgency-day-9", "lists": PAID_HIGH},
+    "2026-01-07": {"template": "final-call-day-10", "lists": [FREE_JULY] + PAID_HIGH},
 }
 
 def load_emails(filenames):
