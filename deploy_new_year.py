@@ -52,7 +52,7 @@ def load_emails(filenames):
         with open(filename, 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                email = row.get("Email")
+                email = row.get("email")
                 if email:
                     emails.add(email.strip())
     return list(emails)
