@@ -9,37 +9,33 @@ from dotenv import load_dotenv
 load_dotenv()
 SERVER_TOKEN = os.getenv("POSTMARK_SERVER_TOKEN")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "contact@mail.anione.me")
-MESSAGE_STREAM = "new-year-campaign"
+MESSAGE_STREAM = "new-year-campaign" # Keeps your established broadcast stream
 
 # Folder where CSVs are stored
 EMAIL_FOLDER = "email"
 
-# Define Audience Groups (Paths updated to /email folder)
-FREE_APRIL = os.path.join(EMAIL_FOLDER, "April_freeUsers.csv")
-FREE_MAY = os.path.join(EMAIL_FOLDER, "May_freeUsers.csv")
-FREE_JUNE = os.path.join(EMAIL_FOLDER, "June_freeUsers.csv")
-FREE_JULY = os.path.join(EMAIL_FOLDER, "July_freeUsers.csv")
-PAID_HIGH = [
-    os.path.join(EMAIL_FOLDER, "paid_appRegisteredFALSE.csv"),
-    os.path.join(EMAIL_FOLDER, "paidNoPackage.csv")
-]
+# Updated User Bases (Paths inside /email folder)
+FREE_OCT = os.path.join(EMAIL_FOLDER, "October2025_freeUsers.csv")
+FREE_DEC = os.path.join(EMAIL_FOLDER, "December2025_freeUsers.csv")
+PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage.csv")
 
-ALL_FREE = [FREE_APRIL, FREE_MAY, FREE_JUNE, FREE_JULY]
-ALL_LISTS = ALL_FREE + PAID_HIGH
+# Alternating Groups to maintain ~2,600 sends/day
+GROUP_A = [FREE_DEC, PAID_NO_PKG] # ~2,563 users
+GROUP_B = [FREE_OCT]              # ~2,624 users
 
-# --- CAMPAIGN MAPPING ---
+# --- FEBRUARY CAMPAIGN MAPPING ---
 # Logic: Map the current date to the Template Alias and specific CSV paths
 CAMPAIGN_MAP = {
-    "2025-12-29": {"template": "ny-gift-day-1", "lists": ALL_LISTS},
-    "2025-12-30": {"template": "xmas-day-2", "lists": [FREE_MAY]},
-    "2025-12-31": {"template": "xmas-day-2", "lists": [FREE_APRIL, FREE_JULY]},
-    "2026-01-01": {"template": "nye-countdown-day-4", "lists": [FREE_JULY] + PAID_HIGH},
-    "2026-01-02": {"template": "xmas-day-4", "lists": [FREE_APRIL, FREE_MAY]},
-    "2026-01-03": {"template": "xmas-day-4", "lists": [FREE_JUNE, FREE_JULY]},
-    "2026-01-04": {"template": "ny-gift-2-day-7", "lists": ALL_LISTS},
-    "2026-01-05": {"template": "token-multiplier-day-8", "lists": [FREE_JUNE] + PAID_HIGH},
-    "2026-01-06": {"template": "multiplier-urgency-day-9", "lists": PAID_HIGH},
-    "2026-01-07": {"template": "final-call-day-10", "lists": [FREE_JULY] + PAID_HIGH},
+    "2026-02-01": {"template": "feb-gift-day-1", "lists": GROUP_A},
+    "2026-02-02": {"template": "feb-gift-day-1", "lists": GROUP_B},
+    "2026-02-03": {"template": "feb-custom-char-day-3", "lists": GROUP_A},
+    "2026-02-04": {"template": "feb-custom-char-day-3", "lists": GROUP_B},
+    "2026-02-05": {"template": "feb-custom-scene-day-5", "lists": GROUP_A},
+    "2026-02-06": {"template": "feb-custom-scene-day-5", "lists": GROUP_B},
+    "2026-02-07": {"template": "feb-sale-day-7", "lists": GROUP_A},
+    "2026-02-08": {"template": "feb-sale-day-7", "lists": GROUP_B},
+    "2026-02-09": {"template": "feb-multiplier-day-9", "lists": GROUP_A},
+    "2026-02-10": {"template": "feb-multiplier-day-9", "lists": GROUP_B},
 }
 
 def load_emails(filenames):
@@ -111,7 +107,7 @@ def main():
         print("🛑 No campaign scheduled for today. Exiting.")
         return
 
-    print(f"🚀 Launching Campaign Day: {today} | Template: {config['template']}")
+    print(f"🚀 Launching February Campaign Day: {today} | Template: {config['template']}")
     email_list = load_emails(config['lists'])
     
     if not email_list:
