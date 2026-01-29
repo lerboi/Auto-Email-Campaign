@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 SERVER_TOKEN = os.getenv("POSTMARK_SERVER_TOKEN")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "contact@mail.anione.me")
-MESSAGE_STREAM = "new-year-campaign" # Keeps your established broadcast stream
+MESSAGE_STREAM = "monthly-campaign" # Keeps your established broadcast stream
 
 # Folder where CSVs are stored
 EMAIL_FOLDER = "email"
