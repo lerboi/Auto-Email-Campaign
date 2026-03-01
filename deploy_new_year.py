@@ -9,33 +9,35 @@ from dotenv import load_dotenv
 load_dotenv()
 SERVER_TOKEN = os.getenv("POSTMARK_SERVER_TOKEN")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "contact@mail.anione.me")
-MESSAGE_STREAM = "monthly-campaign" # Keeps your established broadcast stream
+MESSAGE_STREAM = "monthly-campaign"
 
 # Folder where CSVs are stored
 EMAIL_FOLDER = "email"
 
 # Updated User Bases (Paths inside /email folder)
-FREE_OCT = os.path.join(EMAIL_FOLDER, "October2025_freeUsers.csv")
-FREE_DEC = os.path.join(EMAIL_FOLDER, "December2025_freeUsers.csv")
-PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage.csv")
+FREE_OCT = os.path.join(EMAIL_FOLDER, "Feb2026-freeUsers.csv")
+FREE_DEC = os.path.join(EMAIL_FOLDER, "June_freeUsers.csv")
+PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage_new.csv")
 
 # Alternating Groups to maintain ~2,600 sends/day
 GROUP_A = [FREE_DEC, PAID_NO_PKG] # ~2,563 users
 GROUP_B = [FREE_OCT]              # ~2,624 users
 
-# --- FEBRUARY CAMPAIGN MAPPING ---
+# --- MARCH CAMPAIGN MAPPING ---
 # Logic: Map the current date to the Template Alias and specific CSV paths
 CAMPAIGN_MAP = {
-    "2026-02-01": {"template": "feb-gift-day-1", "lists": GROUP_A},
-    "2026-02-02": {"template": "feb-gift-day-1", "lists": GROUP_B},
-    "2026-02-03": {"template": "feb-custom-char-day-3", "lists": GROUP_A},
-    "2026-02-04": {"template": "feb-custom-char-day-3", "lists": GROUP_B},
-    "2026-02-05": {"template": "feb-custom-scene-day-5", "lists": GROUP_A},
-    "2026-02-06": {"template": "feb-custom-scene-day-5", "lists": GROUP_B},
-    "2026-02-07": {"template": "feb-sale-day-7", "lists": GROUP_A},
-    "2026-02-08": {"template": "feb-sale-day-7", "lists": GROUP_B},
-    "2026-02-09": {"template": "feb-multiplier-day-9", "lists": GROUP_A},
-    "2026-02-10": {"template": "feb-multiplier-day-9", "lists": GROUP_B},
+    "2026-03-02": {"template": "mar-gift-day-1", "lists": GROUP_A},
+    "2026-03-03": {"template": "mar-gift-day-1", "lists": GROUP_B},
+    "2026-03-04": {"template": "mar-custom-char-day-3", "lists": GROUP_A},
+    "2026-03-05": {"template": "mar-custom-char-day-3", "lists": GROUP_B},
+    "2026-03-06": {"template": "mar-custom-scenario-day-5", "lists": GROUP_A},
+    "2026-03-07": {"template": "mar-custom-scenario-day-5", "lists": GROUP_B},
+    "2026-03-08": {"template": "mar-sale-day-7", "lists": GROUP_A},
+    "2026-03-09": {"template": "mar-sale-day-7", "lists": GROUP_B},
+    "2026-03-10": {"template": "mar-multiplier-day-9", "lists": GROUP_A},
+    "2026-03-11": {"template": "mar-multiplier-day-9", "lists": GROUP_B},
+    "2026-03-12": {"template": "mar-urgency-final-day-8", "lists": GROUP_A},
+    "2026-03-13": {"template": "mar-urgency-final-day-8", "lists": GROUP_B},
 }
 
 def load_emails(filenames):
@@ -107,7 +109,7 @@ def main():
         print("🛑 No campaign scheduled for today. Exiting.")
         return
 
-    print(f"🚀 Launching February Campaign Day: {today} | Template: {config['template']}")
+    print(f"🚀 Launching Monthly Campaign Day: {today} | Template: {config['template']}")
     email_list = load_emails(config['lists'])
     
     if not email_list:
