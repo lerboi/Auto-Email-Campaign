@@ -2,8 +2,8 @@ import csv
 import os
 
 # Configuration
-INPUT_FILE = "email/all_paid_users.csv"  # Change to your filename
-OUTPUT_FILE = "email/DEDUPLICATED_all_paid_users.csv"
+INPUT_FILE = "email/FreeUsers_March.csv"  # Change to your filename
+OUTPUT_FILE = "email/DEDUPLICATED_FreeUsers_March.csv"
 
 def normalize_email(email):
     """

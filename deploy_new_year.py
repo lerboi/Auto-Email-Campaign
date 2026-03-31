@@ -15,29 +15,30 @@ MESSAGE_STREAM = "monthly-campaign"
 EMAIL_FOLDER = "email"
 
 # Updated User Bases (Paths inside /email folder)
-FREE_OCT = os.path.join(EMAIL_FOLDER, "Feb2026-freeUsers.csv")
-FREE_DEC = os.path.join(EMAIL_FOLDER, "June_freeUsers.csv")
-PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage_new.csv")
+FREE_MARCH = os.path.join(EMAIL_FOLDER, "CLEANED_FreeUsers_March.csv")
+FREE_MAY = os.path.join(EMAIL_FOLDER, "CLEANED_FreeUsers_May.csv")
+PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage_May.csv")
 
-# Alternating Groups to maintain ~2,600 sends/day
-GROUP_A = [FREE_DEC, PAID_NO_PKG] # ~2,563 users
-GROUP_B = [FREE_OCT]              # ~2,624 users
+# Alternating Groups
+GROUP_A = [FREE_MARCH, PAID_NO_PKG]
+GROUP_B = [FREE_MAY]
 
-# --- MARCH CAMPAIGN MAPPING ---
+# --- APRIL CAMPAIGN MAPPING ---
 # Logic: Map the current date to the Template Alias and specific CSV paths
+# Template aliases sourced from templates/april/day-*/metadata.txt
 CAMPAIGN_MAP = {
-    "2026-03-02": {"template": "mar-gift-day-1", "lists": GROUP_A},
-    "2026-03-03": {"template": "mar-gift-day-1", "lists": GROUP_B},
-    "2026-03-04": {"template": "mar-custom-char-day-3", "lists": GROUP_A},
-    "2026-03-05": {"template": "mar-custom-char-day-3", "lists": GROUP_B},
-    "2026-03-06": {"template": "mar-custom-scenario-day-5", "lists": GROUP_A},
-    "2026-03-07": {"template": "mar-custom-scenario-day-5", "lists": GROUP_B},
-    "2026-03-08": {"template": "mar-sale-day-7", "lists": GROUP_A},
-    "2026-03-09": {"template": "mar-sale-day-7", "lists": GROUP_B},
-    "2026-03-10": {"template": "mar-multiplier-day-9", "lists": GROUP_A},
-    "2026-03-11": {"template": "mar-multiplier-day-9", "lists": GROUP_B},
-    "2026-03-12": {"template": "mar-urgency-final-day-8", "lists": GROUP_A},
-    "2026-03-13": {"template": "mar-urgency-final-day-8", "lists": GROUP_B},
+    "2026-04-02": {"template": "apr-gift-day-1", "lists": GROUP_A},
+    "2026-04-03": {"template": "apr-gift-day-1", "lists": GROUP_B},
+    "2026-04-04": {"template": "apr-voice-calls-day-3", "lists": GROUP_A},
+    "2026-04-05": {"template": "apr-voice-calls-day-3", "lists": GROUP_B},
+    "2026-04-06": {"template": "apr-voice-deep-day-5", "lists": GROUP_A},
+    "2026-04-07": {"template": "apr-voice-deep-day-5", "lists": GROUP_B},
+    "2026-04-08": {"template": "apr-sale-day-7", "lists": GROUP_A},
+    "2026-04-09": {"template": "apr-sale-day-7", "lists": GROUP_B},
+    "2026-04-10": {"template": "apr-multiplier-day-9", "lists": GROUP_A},
+    "2026-04-11": {"template": "apr-multiplier-day-9", "lists": GROUP_B},
+    "2026-04-12": {"template": "apr-urgency-final-day-10", "lists": GROUP_A},
+    "2026-04-13": {"template": "apr-urgency-final-day-10", "lists": GROUP_B},
 }
 
 def load_emails(filenames):
