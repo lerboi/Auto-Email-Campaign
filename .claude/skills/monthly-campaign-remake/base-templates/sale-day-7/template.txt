@@ -1,0 +1,19 @@
+{{HEADING}}
+
+Hi there,
+
+{{BODY_PARAGRAPH_1}}
+
+{{BODY_PARAGRAPH_2}}
+
+{{DEAL_TITLE}}
+Use code {{SALE_CODE}} before the timer runs out to get:
+
+{{BENEFIT_BULLETS_PLAIN}}
+
+Upgrade Now: https://www.anione.me/en/Pricing?voucher={{SALE_CODE}}
+
+{{CLOSING_LINE}}
+
+(c) {{YEAR}} Anione. All rights reserved.
+Unsubscribe: {{{ pm:unsubscribe }}}

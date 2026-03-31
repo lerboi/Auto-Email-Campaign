@@ -1,0 +1,20 @@
+{{HEADING}}
+
+Hi there,
+
+{{BODY_PARAGRAPH_1}}
+
+{{BODY_PARAGRAPH_2}}
+
+{{BOX_TITLE}}
+
+{{BOX_DESCRIPTION}}
+
+Use code {{MULTIPLIER_CODE}} at checkout before it expires.
+
+{{CTA_BUTTON_TEXT}}: https://www.anione.me/en/Pricing?voucher={{MULTIPLIER_CODE}}
+
+{{CLOSING_LINE}}
+
+(c) {{YEAR}} Anione. All rights reserved.
+Unsubscribe: {{{ pm:unsubscribe }}}

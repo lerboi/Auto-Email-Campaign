@@ -1,0 +1,19 @@
+{{HEADING}}
+
+Hi there,
+
+{{BODY_PARAGRAPH_1}}
+
+{{BODY_PARAGRAPH_2}}
+
+{{VOUCHER_TITLE}}: {{GIFT_CODE}}
+{{VOUCHER_DESCRIPTION}}
+
+Redeem My Gift Now: https://www.anione.me/en/Profile?tab=redeem&code={{GIFT_CODE}}
+
+(Note: This voucher expires in 48 hours.)
+
+{{PS_LINE}}
+
+(c) {{YEAR}} Anione. All rights reserved.
+Unsubscribe: {{{ pm:unsubscribe }}}

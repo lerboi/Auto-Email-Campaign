@@ -1,0 +1,23 @@
+{{HEADING}}
+
+Hi there,
+
+{{INTRO_PARAGRAPH}}
+
+[GIF: {{GIF_ALT_TEXT}}]
+
+{{DETAIL_PARAGRAPH}}
+
+{{BOX_TITLE}}:
+{{FEATURE_1_LABEL}}: {{FEATURE_1_DESC}}
+{{FEATURE_2_LABEL}}: {{FEATURE_2_DESC}}
+{{FEATURE_3_LABEL}}: {{FEATURE_3_DESC}}
+{{FEATURE_4_LABEL}}: {{FEATURE_4_DESC}}
+{{FEATURE_5_LABEL}}: {{FEATURE_5_DESC}}
+
+{{CLOSING_LINE}}
+
+{{CTA_BUTTON_TEXT}}: {{CTA_LINK}}
+
+(c) {{YEAR}} Anione. All rights reserved.
+Unsubscribe: {{{ pm:unsubscribe }}}
