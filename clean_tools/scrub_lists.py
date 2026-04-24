@@ -115,9 +115,9 @@ def normalize_and_validate(email):
         return False, "too_short"
 
     # 8. Excessive digits (>60% of username is digits)
-    digit_count = sum(1 for c in username if c.isdigit())
-    if len(username) >= 5 and digit_count / len(username) > 0.6:
-        return False, "digit_heavy"
+    # digit_count = sum(1 for c in username if c.isdigit())
+    # if len(username) >= 5 and digit_count / len(username) > 0.6:
+    #     return False, "digit_heavy"
 
     # 9. Gibberish / keyboard-mash detection
     if is_gibberish(username):

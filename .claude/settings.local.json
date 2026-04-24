@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx skills:*)",
       "Bash(mkdir -p \"C:/Users/leheh/.Projects/Auto-Email-Campaign/.claude/skills/monthly-campaign-remake\")",
-      "Bash(mkdir -p \"C:/Users/leheh/.Projects/Auto-Email-Campaign/.claude/skills/monthly-campaign-remake/references\")"
+      "Bash(mkdir -p \"C:/Users/leheh/.Projects/Auto-Email-Campaign/.claude/skills/monthly-campaign-remake/references\")",
+      "Bash(git mv *)"
     ]
   }
 }
