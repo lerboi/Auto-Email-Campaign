@@ -1,0 +1,21 @@
+Your AI art just got a serious upgrade.
+
+Hi there,
+
+This June we rebuilt the engine behind image creation. The upgraded Natural Mode reads your prompts more closely and renders them with cleaner linework, better proportions, and detail that finally holds up under a close look.
+
+[4 new sample generations shown in the email]
+
+The difference shows the moment you generate. Faces stay consistent, hands behave, lighting feels intentional, and the anime style stays true instead of drifting into something generic. Describe what you want in plain English and the model meets you there — fewer rerolls, fewer compromises, and more images you actually want to keep.
+
+WHY THE NEW NATURAL MODE HITS DIFFERENT:
+- Sharper, Cleaner Detail: Crisp linework and accurate anatomy — no more melted hands or fuzzy faces.
+- Truer Anime Style: The look stays authentically anime instead of drifting generic.
+- Prompts That Just Work: Plain-English descriptions land closer on the first try, with far fewer rerolls.
+
+Generate Something New: https://www.anione.me/en
+
+The upgrade is live. Your next generation will show it.
+
+(c) 2026 Anione. All rights reserved.
+Unsubscribe: {{{ pm:unsubscribe }}}
