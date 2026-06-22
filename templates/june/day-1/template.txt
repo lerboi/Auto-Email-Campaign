@@ -16,4 +16,4 @@ Redeem My Gift Now: https://www.anione.me/en/Profile?tab=redeem&code=JUN2026
 P.S. Keep an eye on your inbox this June. We've got a major upgrade dropping in a few days — and it changes everything about how your characters look.
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

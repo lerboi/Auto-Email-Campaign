@@ -20,4 +20,4 @@ Hi there,
 {{CTA_BUTTON_TEXT}}: {{CTA_LINK}}
 
 (c) {{YEAR}} Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

@@ -20,4 +20,4 @@ You've been reading her for months. Try listening this May.
 Hear Her For Yourself: https://www.anione.me/en
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

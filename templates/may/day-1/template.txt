@@ -16,4 +16,4 @@ Redeem My Gift Now: https://www.anione.me/en/Profile?tab=redeem&code=MAY2026
 P.S. Keep watching your inbox this May. We have a few sun-soaked surprises on the way.
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

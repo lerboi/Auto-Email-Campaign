@@ -1,103 +1,121 @@
-import csv
 import os
-import requests
+import re
 import sys
+import requests
 from datetime import datetime
 from dotenv import load_dotenv
 
 # --- CONFIGURATION ---
 load_dotenv()
-SERVER_TOKEN = os.getenv("POSTMARK_SERVER_TOKEN")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "contact@mail.anione.me")
-MESSAGE_STREAM = "monthly-campaign"
+SENDER_NAME = os.getenv("SENDER_NAME", "AniOne")
+FROM = f"{SENDER_NAME} <{SENDER_EMAIL}>"
 
-# Folder where CSVs are stored
+API_BASE = "https://api.resend.com"
+
+# Folder where CSVs are stored. The CSVs remain the source of truth for the
+# recipient lists; sync_contacts.py pushes them into the Resend segments below.
 EMAIL_FOLDER = "email"
 
-# Updated User Bases (Paths inside /email folder)
-FREE_MAY2025 = os.path.join(EMAIL_FOLDER, "May2025_Free_CLEANED.csv")
-FREE_MAY2026 = os.path.join(EMAIL_FOLDER, "May2026_freeUsers_CLEANED.csv")
-PAID_NO_PKG = os.path.join(EMAIL_FOLDER, "paidNoPackage_May.csv")
+# Resend Segment IDs. Create them once with `python sync_contacts.py --create`,
+# then set these in the environment (Railway + .env).
+SEGMENT_A = os.getenv("RESEND_SEGMENT_A")
+SEGMENT_B = os.getenv("RESEND_SEGMENT_B")
 
-# Alternating Groups
-GROUP_A = [FREE_MAY2025, PAID_NO_PKG]
-GROUP_B = [FREE_MAY2026]
+# Source CSVs for each segment (synced into Resend by sync_contacts.py).
+GROUP_A_FILES = [
+    os.path.join(EMAIL_FOLDER, "May2025_Free_CLEANED.csv"),
+    os.path.join(EMAIL_FOLDER, "paidNoPackage_May.csv"),
+]
+GROUP_B_FILES = [
+    os.path.join(EMAIL_FOLDER, "May2026_freeUsers_CLEANED.csv"),
+]
 
-# --- JUNE CAMPAIGN MAPPING ---
-# Logic: Map the current date to the Template Alias and specific CSV paths
-# Template aliases sourced from templates/june/day-*/metadata.txt
+# --- JULY CAMPAIGN MAPPING ---
+# Map each send date to the local template folder + the Resend segment to send to.
+# (Replaces Postmark's TemplateAlias + MessageStream. The HTML/subject are read
+#  from disk and sent inline via a Resend Broadcast — no dashboard upload needed.)
 CAMPAIGN_MAP = {
-    "2026-06-01": {"template": "jun-gift-day-1", "lists": GROUP_A},
-    "2026-06-02": {"template": "jun-gift-day-1", "lists": GROUP_B},
-    "2026-06-03": {"template": "jun-image-quality-day-3", "lists": GROUP_A},
-    "2026-06-04": {"template": "jun-image-quality-day-3", "lists": GROUP_B},
-    "2026-06-13": {"template": "jun-new-characters-day-5", "lists": GROUP_A},
-    "2026-06-14": {"template": "jun-new-characters-day-5", "lists": GROUP_B},
-    "2026-06-07": {"template": "jun-sale-day-7", "lists": GROUP_A},
-    "2026-06-08": {"template": "jun-sale-day-7", "lists": GROUP_B},
-    "2026-06-09": {"template": "jun-multiplier-day-9", "lists": GROUP_A},
-    "2026-06-10": {"template": "jun-multiplier-day-9", "lists": GROUP_B},
-    "2026-06-11": {"template": "jun-urgency-final-day-10", "lists": GROUP_A},
-    "2026-06-12": {"template": "jun-urgency-final-day-10", "lists": GROUP_B},
+    "2026-07-01": {"template_dir": "templates/july/day-1",  "segment": SEGMENT_A},
+    "2026-07-02": {"template_dir": "templates/july/day-1",  "segment": SEGMENT_B},
+    "2026-07-03": {"template_dir": "templates/july/day-3",  "segment": SEGMENT_A},
+    "2026-07-04": {"template_dir": "templates/july/day-3",  "segment": SEGMENT_B},
+    "2026-07-05": {"template_dir": "templates/july/day-5",  "segment": SEGMENT_A},
+    "2026-07-06": {"template_dir": "templates/july/day-5",  "segment": SEGMENT_B},
+    "2026-07-07": {"template_dir": "templates/july/day-7",  "segment": SEGMENT_A},
+    "2026-07-08": {"template_dir": "templates/july/day-7",  "segment": SEGMENT_B},
+    "2026-07-09": {"template_dir": "templates/july/day-9",  "segment": SEGMENT_A},
+    "2026-07-10": {"template_dir": "templates/july/day-9",  "segment": SEGMENT_B},
+    "2026-07-11": {"template_dir": "templates/july/day-10", "segment": SEGMENT_A},
+    "2026-07-12": {"template_dir": "templates/july/day-10", "segment": SEGMENT_B},
 }
 
-def load_emails(filenames):
-    """Loads and de-duplicates emails from a list of CSV files in the /email folder."""
-    emails = set()
-    for filename in filenames:
-        if not os.path.exists(filename):
-            print(f"⚠️ Warning: File '{filename}' not found. Skipping.")
-            continue
-        with open(filename, 'r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                email = row.get("email")
-                if email:
-                    emails.add(email.strip())
-    return list(emails)
 
-def send_batch(email_list, template_alias):
-    """Sends emails in batches of 500 using Postmark batchWithTemplates."""
-    url = "https://api.postmarkapp.com/email/batchWithTemplates"
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "X-Postmark-Server-Token": SERVER_TOKEN
+def load_template(template_dir):
+    """Reads the local HTML body, plain-text body, Subject, and Name for a day."""
+    html_path = os.path.join(template_dir, "template.html")
+    with open(html_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    text = None
+    text_path = os.path.join(template_dir, "template.txt")
+    if os.path.exists(text_path):
+        with open(text_path, "r", encoding="utf-8") as f:
+            text = f.read()
+
+    subject = name = None
+    with open(os.path.join(template_dir, "metadata.txt"), "r", encoding="utf-8") as f:
+        meta = f.read()
+    m = re.search(r"^Subject:\s*(.+)$", meta, re.MULTILINE)
+    if m:
+        subject = m.group(1).strip()
+    m = re.search(r"^Name:\s*(.+)$", meta, re.MULTILINE)
+    if m:
+        name = m.group(1).strip()
+
+    return html, text, subject, name
+
+
+def send_broadcast(template_dir, segment_id):
+    """Creates and sends a Resend Broadcast to a segment using the local template."""
+    html, text, subject, name = load_template(template_dir)
+
+    if not subject:
+        print(f"   ❌ No 'Subject:' found in {template_dir}/metadata.txt")
+        return False
+
+    payload = {
+        "segment_id": segment_id,
+        "from": FROM,
+        "subject": subject,
+        "name": name or template_dir,
+        "html": html,          # footer contains {{{RESEND_UNSUBSCRIBE_URL}}}
+        "send": True,          # create AND send in a single request
     }
-    
-    batch_size = 500
-    total_sent = 0
-    
-    for i in range(0, len(email_list), batch_size):
-        chunk = email_list[i:i + batch_size]
-        messages_payload = []
-        
-        for email in chunk:
-            messages_payload.append({
-                "From": SENDER_EMAIL,
-                "To": email,
-                "TemplateAlias": template_alias,
-                "TemplateModel": {}, 
-                "MessageStream": MESSAGE_STREAM
-            })
-        
-        payload = {"Messages": messages_payload}
-        
-        try:
-            response = requests.post(url, headers=headers, json=payload)
-            if response.status_code == 200:
-                total_sent += len(chunk)
-                print(f"   ✅ Sent batch of {len(chunk)} emails. (Total: {total_sent})")
-            else:
-                print(f"   ❌ API Error {response.status_code}: {response.text}")
-        except Exception as e:
-            print(f"   ❌ Network Error: {e}")
-            
-    return total_sent
+    if text:
+        payload["text"] = text
+
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json",
+    }
+
+    try:
+        response = requests.post(f"{API_BASE}/broadcasts", headers=headers, json=payload)
+        if 200 <= response.status_code < 300:
+            print(f"   ✅ Broadcast created & sent. ID: {response.json().get('id')}")
+            return True
+        print(f"   ❌ API Error {response.status_code}: {response.text}")
+        return False
+    except Exception as e:
+        print(f"   ❌ Network Error: {e}")
+        return False
+
 
 def main():
-    if not SERVER_TOKEN:
-        print("❌ Error: POSTMARK_SERVER_TOKEN missing in environment.")
+    if not RESEND_API_KEY:
+        print("❌ Error: RESEND_API_KEY missing in environment.")
         sys.exit(1)
 
     # Use Today's Date (Format: YYYY-MM-DD)
@@ -105,21 +123,24 @@ def main():
     print(f"📅 Current Date detected: {today}")
 
     config = CAMPAIGN_MAP.get(today)
-    
     if not config:
         print("🛑 No campaign scheduled for today. Exiting.")
         return
 
-    print(f"🚀 Launching Monthly Campaign Day: {today} | Template: {config['template']}")
-    email_list = load_emails(config['lists'])
-    
-    if not email_list:
-        print("⚠️ No emails found for today's target lists.")
-        return
+    segment_id = config["segment"]
+    if not segment_id:
+        print("❌ Error: Segment ID for today's group is not set (RESEND_SEGMENT_A/B).")
+        sys.exit(1)
 
-    print(f"📧 Targeting {len(email_list)} unique users from subfolder: /{EMAIL_FOLDER}")
-    count = send_batch(email_list, config['template'])
-    print(f"✅ Mission Accomplished. {count} emails delivered.")
+    print(f"🚀 Launching Monthly Campaign Day: {today} | Template: {config['template_dir']}")
+    print(f"📧 Sending broadcast to segment: {segment_id}")
+
+    if send_broadcast(config["template_dir"], segment_id):
+        print("✅ Mission Accomplished. Broadcast dispatched to Resend.")
+    else:
+        print("⚠️ Broadcast failed — see error above.")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

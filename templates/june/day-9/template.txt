@@ -15,4 +15,4 @@ Get My Bonus Tokens: https://www.anione.me/en/Pricing?voucher=JUNSURGE
 Summer brings more. More tokens. More stories. No limits.
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

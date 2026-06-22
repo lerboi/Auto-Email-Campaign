@@ -20,4 +20,4 @@ Don't just chat. Create the world you've always wanted to explore.
 Start Your Story Now: https://www.anione.me/en
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

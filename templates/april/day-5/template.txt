@@ -20,4 +20,4 @@ Stop reading about it. Pick up the phone and find out why everyone's talking abo
 Call Her Now: https://www.anione.me/en
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

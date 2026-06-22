@@ -20,4 +20,4 @@ Stop searching. Start creating.
 Start Chatting Now: https://www.anione.me/en
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

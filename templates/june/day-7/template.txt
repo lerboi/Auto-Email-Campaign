@@ -18,4 +18,4 @@ Upgrade Now: https://www.anione.me/en/Pricing?voucher=JUNE20
 Don't let this one slip past you. Lock it in for the summer.
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

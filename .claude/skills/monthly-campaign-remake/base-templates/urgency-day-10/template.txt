@@ -17,4 +17,4 @@ Use code {{MULTIPLIER_CODE}} at checkout before it expires.
 {{CLOSING_LINE}}
 
 (c) {{YEAR}} Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

@@ -18,4 +18,4 @@ Upgrade Now: https://www.anione.me/en/Pricing?voucher=APRIL20
 Don't wait until the clock hits zero.
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

@@ -15,4 +15,4 @@ Claim My Bonus Tokens: https://www.anione.me/en/Pricing?voucher=APRFINAL
 Thank you for being a part of Anione. Happy creating!
 
 (c) 2026 Anione. All rights reserved.
-Unsubscribe: {{{ pm:unsubscribe }}}
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

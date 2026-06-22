@@ -1,11 +1,11 @@
 ---
 name: monthly-campaign-remake
-description: Recreates Anione's monthly Postmark email campaign templates for a new month. Use this skill whenever the user says things like "new month campaign", "remake templates for April", "update campaign for next month", "create new monthly emails", "prepare next campaign", or any request about generating fresh email templates for a new campaign period. This is the primary skill for the monthly email marketing workflow.
+description: Recreates Anione's monthly Resend email campaign templates for a new month. Use this skill whenever the user says things like "new month campaign", "remake templates for April", "update campaign for next month", "create new monthly emails", "prepare next campaign", or any request about generating fresh email templates for a new campaign period. This is the primary skill for the monthly email marketing workflow.
 ---
 
 # Monthly Campaign Remake
 
-This skill handles the end-to-end process of remaking Anione's monthly Postmark email campaign templates for a new month. It takes the previous month's 6 unique templates (10 campaign days with A/B group alternation) and produces refreshed versions with new copy, promo codes, seasonal theming, and updated metadata.
+This skill handles the end-to-end process of remaking Anione's monthly Resend email campaign templates for a new month. It takes the previous month's 6 unique templates (10 campaign days with A/B group alternation) and produces refreshed versions with new copy, promo codes, seasonal theming, and updated metadata. Templates are sent **inline** via Resend Broadcasts (read from disk at send time) — there is no template-upload-to-dashboard step.
 
 ## Before You Start
 
@@ -26,7 +26,7 @@ This skill handles the end-to-end process of remaking Anione's monthly Postmark 
 
 ## Campaign Structure (6 Unique Templates, 12 Send Days)
 
-The campaign follows this proven funnel structure. Each template is sent twice (once to GROUP_A, once to GROUP_B on consecutive days) to stay under the ~2,600/day Postmark send limit:
+The campaign follows this proven funnel structure. Each template is sent twice (once to GROUP_A, once to GROUP_B on consecutive days, as two Resend Broadcasts to two Segments) to spread the audience over two days:
 
 | Day | Template Purpose | Tone | Goal |
 |-----|-----------------|------|------|
@@ -202,6 +202,8 @@ Alias: {mon}-{purpose}-day-{N}
 Examples: `apr-gift-day-1`, `apr-sale-day-7`, `apr-multiplier-day-9`
 For Day 3/5 (variable feature slots), the alias reflects whatever feature is chosen: e.g., `apr-voice-calls-day-3`, `apr-image-gen-day-5`
 
+> Note: with Resend, `Alias` is now just an internal label (kept for readability/history). The dispatcher (`deploy_new_year.py`) sends a Broadcast using the `Subject` and `Name` from `metadata.txt` and the inline `template.html`/`template.txt` — it does **not** look up a template by alias. `CAMPAIGN_MAP` keys each date to a `template_dir` + `segment`, not an alias.
+
 ### `template.html`
 The HTML email template. Uses a consistent 600px-wide table layout with:
 - **Preheader text** (hidden div at top for email client previews)
@@ -217,7 +219,7 @@ The HTML email template. Uses a consistent 600px-wide table layout with:
   - Red/pink dashed border for token multiplier
   - Orange/red dashed border for urgency/final
 - **CTA button** — inline-styled link button
-- **Footer** with copyright year and `{{{ pm:unsubscribe }}}` Postmark unsubscribe tag
+- **Footer** with copyright year and the `{{{RESEND_UNSUBSCRIBE_URL}}}` Resend managed-unsubscribe placeholder
 - **Full dark mode support** via `@media (prefers-color-scheme: dark)`
 - **Mobile responsive** via `@media screen and (max-width: 600px)`
 
@@ -246,36 +248,39 @@ For each of the 6 template days, create the 3 files (`metadata.txt`, `template.h
 - Anione logo and branding
 - Color scheme for each template type (green=gift, blue=characters, purple=scenarios, etc.)
 - CTA link patterns (e.g., `https://www.anione.me/en/Profile?tab=redeem&code={CODE}`)
-- Postmark unsubscribe tag `{{{ pm:unsubscribe }}}`
+- Resend unsubscribe placeholder `{{{RESEND_UNSUBSCRIBE_URL}}}`
 - 600px table width, font families, general styling
 - The funnel progression (free gift → features → sale → multiplier → urgency)
 
 ### Step 2: Update `deploy_new_year.py`
 
-Update the `CAMPAIGN_MAP` dictionary with new dates and template aliases:
+Update the `CAMPAIGN_MAP` dictionary with new dates. Each date maps to a local
+template folder (`template_dir`) and the Resend segment to send to (`segment`):
 
 ```python
 CAMPAIGN_MAP = {
-    "{start_date}":   {"template": "{mon}-gift-day-1",            "lists": GROUP_A},
-    "{start+1}":      {"template": "{mon}-gift-day-1",            "lists": GROUP_B},
-    "{start+2}":      {"template": "{mon}-{day3-feature}-day-3",  "lists": GROUP_A},
-    "{start+3}":      {"template": "{mon}-{day3-feature}-day-3",  "lists": GROUP_B},
-    "{start+4}":      {"template": "{mon}-{day5-feature}-day-5",  "lists": GROUP_A},
-    "{start+5}":      {"template": "{mon}-{day5-feature}-day-5",  "lists": GROUP_B},
-    "{start+6}":      {"template": "{mon}-sale-day-7",            "lists": GROUP_A},
-    "{start+7}":      {"template": "{mon}-sale-day-7",            "lists": GROUP_B},
-    "{start+8}":      {"template": "{mon}-multiplier-day-9",      "lists": GROUP_A},
-    "{start+9}":      {"template": "{mon}-multiplier-day-9",      "lists": GROUP_B},
-    "{start+10}":     {"template": "{mon}-urgency-final-day-8",   "lists": GROUP_A},
-    "{start+11}":     {"template": "{mon}-urgency-final-day-8",   "lists": GROUP_B},
+    "{start_date}":   {"template_dir": "templates/{month}/day-1",  "segment": SEGMENT_A},
+    "{start+1}":      {"template_dir": "templates/{month}/day-1",  "segment": SEGMENT_B},
+    "{start+2}":      {"template_dir": "templates/{month}/day-3",  "segment": SEGMENT_A},
+    "{start+3}":      {"template_dir": "templates/{month}/day-3",  "segment": SEGMENT_B},
+    "{start+4}":      {"template_dir": "templates/{month}/day-5",  "segment": SEGMENT_A},
+    "{start+5}":      {"template_dir": "templates/{month}/day-5",  "segment": SEGMENT_B},
+    "{start+6}":      {"template_dir": "templates/{month}/day-7",  "segment": SEGMENT_A},
+    "{start+7}":      {"template_dir": "templates/{month}/day-7",  "segment": SEGMENT_B},
+    "{start+8}":      {"template_dir": "templates/{month}/day-9",  "segment": SEGMENT_A},
+    "{start+9}":      {"template_dir": "templates/{month}/day-9",  "segment": SEGMENT_B},
+    "{start+10}":     {"template_dir": "templates/{month}/day-10", "segment": SEGMENT_A},
+    "{start+11}":     {"template_dir": "templates/{month}/day-10", "segment": SEGMENT_B},
 }
 ```
 
+`{month}` is the lowercase month folder (e.g. `july`). `SEGMENT_A`/`SEGMENT_B`
+are read from `RESEND_SEGMENT_A`/`RESEND_SEGMENT_B` at the top of the file.
 Also update the comment above `CAMPAIGN_MAP` to reflect the new month.
 
 ### Step 3: Verify User Group CSVs
 
-Ask the user if the email lists (GROUP_A, GROUP_B) need updating. If new CSVs are available, update the file paths at the top of `deploy_new_year.py`.
+Ask the user if the email lists (GROUP_A, GROUP_B) need updating. If new CSVs are available, update the `GROUP_A_FILES` / `GROUP_B_FILES` paths at the top of `deploy_new_year.py`, then run `python sync_contacts.py` to push the updated lists into the Resend segments. (The CSVs remain the source of truth; the segments are just where Resend reads recipients from at send time.)
 
 ### Step 4: Present Summary for Review
 
@@ -289,14 +294,15 @@ After generating everything, present a summary table:
 
 And the updated `CAMPAIGN_MAP` dates for confirmation.
 
-### Step 5: Postmark Upload Reminder
+### Step 5: Resend Send Checklist
 
-Remind the user that after reviewing the templates, they need to:
-1. Create each template in Postmark dashboard (Templates → New Template)
-2. Set the **Alias** to match exactly what's in `metadata.txt` and `CAMPAIGN_MAP`
-3. Paste the HTML into the HTML body and plain text into the Text body
-4. Set the Subject line and From address
-5. Assign to the `monthly-campaign` message stream
+There is **no template upload step** with Resend — the HTML/text/subject are read from
+disk and sent inline as a Broadcast. After reviewing the templates, remind the user to:
+1. Confirm the `mail.anione.me` sending domain is verified in Resend (DKIM/SPF/MX).
+2. If the recipient lists changed this month, run `python sync_contacts.py` to push the CSVs into the Resend segments (see Step 3).
+3. Ensure `RESEND_API_KEY`, `RESEND_SEGMENT_A`, and `RESEND_SEGMENT_B` are set in the environment (Railway + `.env`).
+4. Verify each `template.html`/`template.txt` footer still contains the `{{{RESEND_UNSUBSCRIBE_URL}}}` placeholder (managed unsubscribe).
+5. The Railway cron runs `deploy_new_year.py` daily; it sends the scheduled broadcast on each `CAMPAIGN_MAP` date — no manual send needed.
 
 ## Writing Guidelines for Email Copy
 
@@ -343,7 +349,7 @@ base-templates/
 - Proper MSO attributes for Outlook table rendering
 - `role="presentation"` on layout tables for accessibility
 - All images have alt text attributes
-- Postmark unsubscribe tag `{{{ pm:unsubscribe }}}` in footer
+- Resend managed-unsubscribe placeholder `{{{RESEND_UNSUBSCRIBE_URL}}}` in footer
 - Inline styles for maximum email client compatibility (no external CSS)
 
 ## References
