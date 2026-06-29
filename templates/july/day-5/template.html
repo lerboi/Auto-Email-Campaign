@@ -28,12 +28,17 @@
     .email-bg { background-color: #1a1a1a !important; }
     .content-bg { background-color: #2d2d2d !important; color: #ffffff !important; }
     h1, p, .text-adaptive { color: #ffffff !important; }
-    .force-dark-title { color: #a78bfa !important; }
-    .force-dark-text { color: #e5e7eb !important; }
+    /* The feature box keeps its light #f5f3ff background in dark mode, so its
+       text must stay DARK (otherwise it's light-on-light and unreadable). */
+    .force-dark-title { color: #5b21b6 !important; }
+    .force-dark-text { color: #111827 !important; }
    }
    /* OUTLOOK DARK MODE FIX */
    [data-ogsc] .content-bg { background-color: #2d2d2d !important; color: #ffffff !important; }
    [data-ogsc] .text-adaptive { color: #ffffff !important; }
+   /* Keep the light feature box readable in Outlook dark mode too. */
+   [data-ogsc] .force-dark-title { color: #5b21b6 !important; }
+   [data-ogsc] .force-dark-text { color: #111827 !important; }
   </style>
  </head>
  <body style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #f4f4f4;" width="100%">
@@ -55,7 +60,7 @@
     <tr>
      <td class="content-bg" style="background-color: #ffffff; padding: 0;">
       <a href="https://www.anione.me/en/Wheel">
-       <img alt="Streak Rewards on Anione" class="fluid-img" height="" src="PLACEHOLDER_HERO_IMAGE_DAY5.webp" style="width: 100%; max-width: 600px; height: auto; display: block;" width="600"/>
+       <img alt="Streak Rewards on Anione" class="fluid-img" height="" src="https://anione.me/blogs/anime-ai-video-generator-guide-2026/anime-ai-video-generator-guide-2026-hero.webp" style="width: 100%; max-width: 600px; height: auto; display: block;" width="600"/>
       </a>
      </td>
     </tr>
@@ -74,7 +79,7 @@
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0;">
        <tr>
         <td style="text-align: center;">
-         <img alt="Streak Rewards track and loot chests" class="fluid-img" src="PLACEHOLDER_DAY5_STREAK.webp" style="width: 100%; max-width: 540px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block;" width="540"/>
+         <img alt="Streak Rewards track and loot chests" class="fluid-img" src="https://www.anione.me/Emails/Others/streak-showcase.png" style="width: 100%; max-width: 540px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block;" width="540"/>
         </td>
        </tr>
       </table>

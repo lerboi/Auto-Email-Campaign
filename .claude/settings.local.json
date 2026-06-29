@@ -4,7 +4,11 @@
       "Bash(npx skills:*)",
       "Bash(mkdir -p \"C:/Users/leheh/.Projects/Auto-Email-Campaign/.claude/skills/monthly-campaign-remake\")",
       "Bash(mkdir -p \"C:/Users/leheh/.Projects/Auto-Email-Campaign/.claude/skills/monthly-campaign-remake/references\")",
-      "Bash(git mv *)"
+      "Bash(git mv *)",
+      "Bash(python -c \"import sync_contacts; print\\('imports OK; GROUP_C_FILES =', sync_contacts.GROUP_C_FILES, '| SEGMENT_C =', sync_contacts.SEGMENT_C\\)\")",
+      "WebFetch(domain:resend.com)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

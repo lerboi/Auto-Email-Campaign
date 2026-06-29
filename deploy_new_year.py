@@ -2,14 +2,20 @@ import os
 import re
 import sys
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from dotenv import load_dotenv
+
+# Force UTF-8 stdout so emoji status lines don't crash on Windows (cp1252) consoles.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
 
 # --- CONFIGURATION ---
 load_dotenv()
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "contact@mail.anione.me")
-SENDER_NAME = os.getenv("SENDER_NAME", "AniOne")
+SENDER_NAME = os.getenv("SENDER_NAME", "Anione")
 FROM = f"{SENDER_NAME} <{SENDER_EMAIL}>"
 
 API_BASE = "https://api.resend.com"
@@ -19,24 +25,43 @@ API_BASE = "https://api.resend.com"
 EMAIL_FOLDER = "email"
 
 # Resend Segment IDs. Create them once with `python sync_contacts.py --create`,
-# then set these in the environment (Railway + .env).
-SEGMENT_A = os.getenv("RESEND_SEGMENT_A")
-SEGMENT_B = os.getenv("RESEND_SEGMENT_B")
+# then set these in the environment (Railway + .env). On the $80/10k marketing
+# tier ALL FIVE segments are loaded at once (~9k contacts) — no list rotation and
+# no clearing between phases.
+SEGMENT_A = os.getenv("RESEND_SEGMENT_A")  # Wave 1 free (A) + paid (ride-along)
+SEGMENT_B = os.getenv("RESEND_SEGMENT_B")  # Wave 1 free (B)
+SEGMENT_C = os.getenv("RESEND_SEGMENT_C")  # Wave 2 free (C)
+SEGMENT_D = os.getenv("RESEND_SEGMENT_D")  # Wave 2 free (D)
+SEGMENT_E = os.getenv("RESEND_SEGMENT_E")  # Paid finale (E)
 
-# Source CSVs for each segment (synced into Resend by sync_contacts.py).
+# Source CSVs for each segment (synced into Resend by sync_contacts.py). All five
+# are synced once up-front; the campaign just sends to the right segment per day.
+# Provide each CSV (column `email`) exported filtered to opted-in users
+# (newsletter = true). Paid users (E) appear in BOTH Segment A (Wave 1 main) and
+# Segment E (finale) — that's one contact in two segments, billed once.
 GROUP_A_FILES = [
-    os.path.join(EMAIL_FOLDER, "May2025_Free_CLEANED.csv"),
-    os.path.join(EMAIL_FOLDER, "paidNoPackage_May.csv"),
+    os.path.join(EMAIL_FOLDER, "June2026(segA)_Free_CLEANED.csv"),  # free A
+    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),                 # paid (E) rides Wave 1
 ]
 GROUP_B_FILES = [
-    os.path.join(EMAIL_FOLDER, "May2026_freeUsers_CLEANED.csv"),
+    os.path.join(EMAIL_FOLDER, "May2025(segB)_Free_CLEANED.csv"),  # free B
+]
+GROUP_C_FILES = [
+    os.path.join(EMAIL_FOLDER, "Feb-Apr2025(segC)_Free_CLEANED.csv"),  # free C (Wave 2)
+]
+GROUP_D_FILES = [
+    os.path.join(EMAIL_FOLDER, "May2026(segD)_Free_CLEANED.csv"),   # free D (Wave 2)
+]
+GROUP_E_FILES = [
+    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),  # paid (finale + Wave 1 ride-along)
 ]
 
-# --- JULY CAMPAIGN MAPPING ---
+# --- JULY CAMPAIGN MAPPING ($80/10k tier: all segments pre-loaded, no resets) ---
 # Map each send date to the local template folder + the Resend segment to send to.
-# (Replaces Postmark's TemplateAlias + MessageStream. The HTML/subject are read
-#  from disk and sent inline via a Resend Broadcast — no dashboard upload needed.)
+# Two free waves (A/B then C/D, A->B alternating to spread volume) reach all four
+# free lists, with paid users riding Wave 1 (Seg A) and getting a 2-day finale.
 CAMPAIGN_MAP = {
+    # ---- WAVE 1 (Jul 1-12): free A/B + paid, A->B alternating ----
     "2026-07-01": {"template_dir": "templates/july/day-1",  "segment": SEGMENT_A},
     "2026-07-02": {"template_dir": "templates/july/day-1",  "segment": SEGMENT_B},
     "2026-07-03": {"template_dir": "templates/july/day-3",  "segment": SEGMENT_A},
@@ -49,6 +74,29 @@ CAMPAIGN_MAP = {
     "2026-07-10": {"template_dir": "templates/july/day-9",  "segment": SEGMENT_B},
     "2026-07-11": {"template_dir": "templates/july/day-10", "segment": SEGMENT_A},
     "2026-07-12": {"template_dir": "templates/july/day-10", "segment": SEGMENT_B},
+
+    # ---- WAVE 2 (Jul 13-24): free C/D, C->D alternating ----
+    # On Jul 13/17/21 a SECOND send goes out: a paid token-drop to Segment E (a
+    # date can map to a LIST of sends; main() dispatches each).
+    "2026-07-13": [{"template_dir": "templates/july/day-1",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/july/drop-1", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-07-14": {"template_dir": "templates/july/day-1",  "segment": SEGMENT_D},
+    "2026-07-15": {"template_dir": "templates/july/day-3",  "segment": SEGMENT_C},
+    "2026-07-16": {"template_dir": "templates/july/day-3",  "segment": SEGMENT_D},
+    "2026-07-17": [{"template_dir": "templates/july/day-5",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/july/drop-2", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-07-18": {"template_dir": "templates/july/day-5",  "segment": SEGMENT_D},
+    "2026-07-19": {"template_dir": "templates/july/day-7",  "segment": SEGMENT_C},
+    "2026-07-20": {"template_dir": "templates/july/day-7",  "segment": SEGMENT_D},
+    "2026-07-21": [{"template_dir": "templates/july/day-9",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/july/drop-3", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-07-22": {"template_dir": "templates/july/day-9",  "segment": SEGMENT_D},
+    "2026-07-23": {"template_dir": "templates/july/day-10", "segment": SEGMENT_C},
+    "2026-07-24": {"template_dir": "templates/july/day-10", "segment": SEGMENT_D},
+
+    # ---- PAID FINALE (Jul 25-26): Seg E only, dedicated finale templates ----
+    "2026-07-25": {"template_dir": "templates/july/finale-1", "segment": SEGMENT_E},  # premium 30-token gift
+    "2026-07-26": {"template_dir": "templates/july/finale-2", "segment": SEGMENT_E},  # final 20% off
 }
 
 
@@ -77,19 +125,28 @@ def load_template(template_dir):
     return html, text, subject, name
 
 
-def send_broadcast(template_dir, segment_id):
+def send_broadcast(template_dir, segment_id, today=""):
     """Creates and sends a Resend Broadcast to a segment using the local template."""
+    html_path = os.path.join(template_dir, "template.html")
+    meta_path = os.path.join(template_dir, "metadata.txt")
+    if not (os.path.exists(html_path) and os.path.exists(meta_path)):
+        print(f"   ❌ Template files missing in {template_dir} (need template.html + metadata.txt)")
+        return False
+
     html, text, subject, name = load_template(template_dir)
 
     if not subject:
         print(f"   ❌ No 'Subject:' found in {template_dir}/metadata.txt")
         return False
 
+    # Unique, human-readable broadcast name (same template goes to two segments on
+    # consecutive days, so include the date to keep them distinct in the dashboard).
+    base_name = name or os.path.basename(template_dir)
     payload = {
         "segment_id": segment_id,
         "from": FROM,
         "subject": subject,
-        "name": name or template_dir,
+        "name": f"{base_name} [{today}]" if today else base_name,
         "html": html,          # footer contains {{{RESEND_UNSUBSCRIBE_URL}}}
         "send": True,          # create AND send in a single request
     }
@@ -118,27 +175,37 @@ def main():
         print("❌ Error: RESEND_API_KEY missing in environment.")
         sys.exit(1)
 
-    # Use Today's Date (Format: YYYY-MM-DD)
-    today = datetime.now().strftime("%Y-%m-%d")
-    print(f"📅 Current Date detected: {today}")
+    # Use today's date in UTC to match the Railway cron (03:00 UTC) and the
+    # UTC-keyed CAMPAIGN_MAP — a local-timezone container could otherwise resolve
+    # 03:00 UTC to the wrong calendar date and send the wrong day's broadcast.
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    print(f"📅 Current Date detected (UTC): {today}")
 
     config = CAMPAIGN_MAP.get(today)
     if not config:
         print("🛑 No campaign scheduled for today. Exiting.")
         return
 
-    segment_id = config["segment"]
-    if not segment_id:
-        print("❌ Error: Segment ID for today's group is not set (RESEND_SEGMENT_A/B).")
-        sys.exit(1)
+    # A date maps to one send (dict) or several (list of dicts, e.g. a Wave 2 free
+    # send plus a paid token-drop on the same day).
+    sends = config if isinstance(config, list) else [config]
+    print(f"🚀 Monthly Campaign Day: {today} — {len(sends)} send(s) scheduled")
 
-    print(f"🚀 Launching Monthly Campaign Day: {today} | Template: {config['template_dir']}")
-    print(f"📧 Sending broadcast to segment: {segment_id}")
+    all_ok = True
+    for s in sends:
+        segment_id = s["segment"]
+        if not segment_id:
+            print(f"❌ Segment ID not set for {s['template_dir']} (RESEND_SEGMENT_A/B/C/D/E).")
+            all_ok = False
+            continue
+        print(f"📧 {s['template_dir']} → segment {segment_id}")
+        if not send_broadcast(s["template_dir"], segment_id, today):
+            all_ok = False
 
-    if send_broadcast(config["template_dir"], segment_id):
-        print("✅ Mission Accomplished. Broadcast dispatched to Resend.")
+    if all_ok:
+        print("✅ Mission Accomplished. All broadcasts dispatched to Resend.")
     else:
-        print("⚠️ Broadcast failed — see error above.")
+        print("⚠️ One or more broadcasts failed — see errors above.")
         sys.exit(1)
 
 
