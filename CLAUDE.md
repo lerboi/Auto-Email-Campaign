@@ -88,6 +88,32 @@ python scrub_lists.py
 python remove_duplicates.py
 ```
 
+## Previewing & Broadcast Testing (`preview.py`)
+
+`preview.py` sends a TEST copy of a campaign template to a single inbox so you can check it before the real campaign runs. **Two modes:**
+
+```bash
+# Transactional preview (default): sends via Resend's /emails endpoint to one inbox.
+# Fast render check (images, dark mode, fonts). Does NOT touch segments. The
+# {{{RESEND_UNSUBSCRIBE_URL}}} footer shows as LITERAL text (only resolves in a real Broadcast).
+python preview.py you@example.com                 # all day-*/finale-* templates
+python preview.py you@example.com day-1 day-7     # specific ones
+
+# Broadcast test (--broadcast): exercises the REAL production send path end-to-end,
+# reusing deploy_new_year.send_broadcast() verbatim, then polls each broadcast to its
+# true terminal status (sent/failed). NO email arg — it sends to whoever is in the
+# "AniOne BROADCAST TEST" segment (manage that segment's membership in the Resend dashboard).
+python preview.py --broadcast            # all templates to the test segment
+python preview.py day-1 --broadcast      # one template to the test segment
+```
+
+**How `--broadcast` works (and why it's built this way) — important:**
+- A Broadcast targets a **segment**, not an address, so the tool sends to a **persistent test segment named `AniOne BROADCAST TEST`**, found-or-created by name and **REUSED every run — never deleted.** You manage its membership (your test recipients) in the Resend dashboard; `--broadcast` takes **no email argument** and sends to whatever contacts are in it.
+- This persistence is deliberate. **Resend sends broadcasts asynchronously (~30s).** An earlier version created a throwaway segment and deleted it immediately after sending — by the time Resend processed the send the segment was gone, so the broadcast reported `failed` even though the send path was fine. Keeping one persistent segment avoids that race. (The real daily cron is never affected — segments A–E are permanent.)
+- A `2xx` from the create call means **accepted, not delivered.** The tool polls `GET /broadcasts/{id}` until `status` is `sent`/`failed`, so trust that (or Resend's broadcast history), not the create response.
+- This segment is also the natural place to **test managed unsubscribe**: send a broadcast to it, click the unsubscribe link in the received email, and the contact's `unsubscribed` flag flips to `true` — which fires the Resend `contact.updated` webhook (→ `https://anione.me/api/webhooks/resend`).
+- `--broadcast` only covers the dirs in `TEMPLATE_DIRS` (`day-*` + `finale-*`); add the `drop-*` dirs there to test those too.
+
 ## Important Patterns
 
 - Campaign schedules are defined as hardcoded date maps in `CAMPAIGN_MAP` — update this dict for each new campaign period (each date → `{template_dir, segment}`).
