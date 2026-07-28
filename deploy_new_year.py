@@ -40,17 +40,17 @@ SEGMENT_E = os.getenv("RESEND_SEGMENT_E")  # Paid finale (E)
 # (newsletter = true). Paid users (E) appear in BOTH Segment A (Wave 1 main) and
 # Segment E (finale) — that's one contact in two segments, billed once.
 GROUP_A_FILES = [
-    os.path.join(EMAIL_FOLDER, "June2026(segA)_Free_CLEANED.csv"),  # free A
-    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),                 # paid (E) rides Wave 1
+    os.path.join(EMAIL_FOLDER, "July2025_Free_CLEANED.csv"),  # free A (~1878, smallest — paired with paid)
+    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),           # paid (E) rides Wave 1
 ]
 GROUP_B_FILES = [
-    os.path.join(EMAIL_FOLDER, "May2025(segB)_Free_CLEANED.csv"),  # free B
+    os.path.join(EMAIL_FOLDER, "Feb2026_Free_CLEANED.csv"),  # free B (~2739)
 ]
 GROUP_C_FILES = [
-    os.path.join(EMAIL_FOLDER, "Feb-Apr2025(segC)_Free_CLEANED.csv"),  # free C (Wave 2)
+    os.path.join(EMAIL_FOLDER, "July2026_Free_CLEANED.csv"),  # free C (~2285, Wave 2)
 ]
 GROUP_D_FILES = [
-    os.path.join(EMAIL_FOLDER, "May2026(segD)_Free_CLEANED.csv"),   # free D (Wave 2)
+    os.path.join(EMAIL_FOLDER, "Sept2025_Free_CLEANED.csv"),  # free D (~2417, Wave 2)
 ]
 GROUP_E_FILES = [
     os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),  # paid (finale + Wave 1 ride-along)
@@ -97,6 +97,46 @@ CAMPAIGN_MAP = {
     # ---- PAID FINALE (Jul 25-26): Seg E only, dedicated finale templates ----
     "2026-07-25": {"template_dir": "templates/july/finale-1", "segment": SEGMENT_E},  # premium 30-token gift
     "2026-07-26": {"template_dir": "templates/july/finale-2", "segment": SEGMENT_E},  # final 20% off
+
+    # ================= AUGUST CAMPAIGN (2026-08) =================
+    # Same 5-segment design: two free waves (A/B then C/D) + paid drops (Aug 13/17/21)
+    # + paid finale (Aug 25-26). Segments A-E are reused; re-sync the August contact
+    # lists into them with `python sync_contacts.py --fresh` AFTER the Jul 25-26 finale
+    # fires (a --fresh sync wipes all contacts, including the paid finale audience).
+    # ---- WAVE 1 (Aug 1-12): free A/B + paid, A->B alternating ----
+    "2026-08-01": {"template_dir": "templates/august/day-1",  "segment": SEGMENT_A},
+    "2026-08-02": {"template_dir": "templates/august/day-1",  "segment": SEGMENT_B},
+    "2026-08-03": {"template_dir": "templates/august/day-3",  "segment": SEGMENT_A},
+    "2026-08-04": {"template_dir": "templates/august/day-3",  "segment": SEGMENT_B},
+    "2026-08-05": {"template_dir": "templates/august/day-5",  "segment": SEGMENT_A},
+    "2026-08-06": {"template_dir": "templates/august/day-5",  "segment": SEGMENT_B},
+    "2026-08-07": {"template_dir": "templates/august/day-7",  "segment": SEGMENT_A},
+    "2026-08-08": {"template_dir": "templates/august/day-7",  "segment": SEGMENT_B},
+    "2026-08-09": {"template_dir": "templates/august/day-9",  "segment": SEGMENT_A},
+    "2026-08-10": {"template_dir": "templates/august/day-9",  "segment": SEGMENT_B},
+    "2026-08-11": {"template_dir": "templates/august/day-10", "segment": SEGMENT_A},
+    "2026-08-12": {"template_dir": "templates/august/day-10", "segment": SEGMENT_B},
+
+    # ---- WAVE 2 (Aug 13-24): free C/D, C->D alternating; paid drops on 13/17/21 to E ----
+    "2026-08-13": [{"template_dir": "templates/august/day-1",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/august/drop-1", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-08-14": {"template_dir": "templates/august/day-1",  "segment": SEGMENT_D},
+    "2026-08-15": {"template_dir": "templates/august/day-3",  "segment": SEGMENT_C},
+    "2026-08-16": {"template_dir": "templates/august/day-3",  "segment": SEGMENT_D},
+    "2026-08-17": [{"template_dir": "templates/august/day-5",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/august/drop-2", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-08-18": {"template_dir": "templates/august/day-5",  "segment": SEGMENT_D},
+    "2026-08-19": {"template_dir": "templates/august/day-7",  "segment": SEGMENT_C},
+    "2026-08-20": {"template_dir": "templates/august/day-7",  "segment": SEGMENT_D},
+    "2026-08-21": [{"template_dir": "templates/august/day-9",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/august/drop-3", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-08-22": {"template_dir": "templates/august/day-9",  "segment": SEGMENT_D},
+    "2026-08-23": {"template_dir": "templates/august/day-10", "segment": SEGMENT_C},
+    "2026-08-24": {"template_dir": "templates/august/day-10", "segment": SEGMENT_D},
+
+    # ---- PAID FINALE (Aug 25-26): Seg E only, dedicated finale templates ----
+    "2026-08-25": {"template_dir": "templates/august/finale-1", "segment": SEGMENT_E},  # premium 30-token gift
+    "2026-08-26": {"template_dir": "templates/august/finale-2", "segment": SEGMENT_E},  # final 20% off
 }
 
 

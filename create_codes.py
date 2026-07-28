@@ -38,18 +38,18 @@ LOCAL_UTC_OFFSET_HOURS = 8     # anione.me local time = UTC+8
 # CODES = token grants (RedeemCodes). `starts`/`expires` are LOCAL "YYYY-MM-DD HH:MM"
 # (omit `starts` to make it live immediately). At least one token field must be > 0.
 CODES = [
-    {"code": "JUL2026",   "image_tokens": 10, "text_tokens": 0,
-     "starts": "2026-06-30 00:00", "expires": "2026-07-31 23:59"},
-    {"code": "PREMIUM30", "image_tokens": 30, "text_tokens": 0,
-     "starts": "2026-07-24 00:00", "expires": "2026-07-31 23:59"},
-    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Jul 13/17/21).
+    {"code": "AUG2026",   "image_tokens": 10, "text_tokens": 0,
+     "starts": "2026-07-31 00:00", "expires": "2026-08-31 23:59"},
+    {"code": "AUGVIP30",  "image_tokens": 30, "text_tokens": 0,
+     "starts": "2026-08-24 00:00", "expires": "2026-08-31 23:59"},
+    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Aug 13/17/21).
     # Each is a separate code (a redeem code is once-per-user), 20 image tokens, starts a day before its send.
-    {"code": "DROP1", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-07-12 00:00", "expires": "2026-07-31 23:59"},
-    {"code": "DROP2", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-07-16 00:00", "expires": "2026-07-31 23:59"},
-    {"code": "DROP3", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-07-20 00:00", "expires": "2026-07-31 23:59"},
+    {"code": "AUGDROP1", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-08-12 00:00", "expires": "2026-08-31 23:59"},
+    {"code": "AUGDROP2", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-08-16 00:00", "expires": "2026-08-31 23:59"},
+    {"code": "AUGDROP3", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-08-20 00:00", "expires": "2026-08-31 23:59"},
 ]
 
 # VOUCHERS = checkout discounts/multipliers (Vouchers). No start date (live on create).
@@ -59,15 +59,15 @@ CODES = [
 #                      "packages" = token purchases only (a token-pack multiplier)
 #                      None       = applies to both
 VOUCHERS = [
-    {"code": "JULY20",   "description": "July 20% off subscription (day-7)",
+    {"code": "AUG20",     "description": "August 20% off subscription (day-7)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-07-31 23:59"},
-    {"code": "FINAL20",  "description": "Final 20% off subscription (finale day-26)",
+     "expires": "2026-08-31 23:59"},
+    {"code": "AUGFINAL20", "description": "Final 20% off subscription (finale day-26)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-07-31 23:59"},
-    {"code": "JULSURGE", "description": "July 1.5x token multiplier (day-9/day-10)",
+     "expires": "2026-08-31 23:59"},
+    {"code": "AUGSURGE",  "description": "August 1.5x token multiplier (day-9/day-10)",
      "type": "tokenMultiplier", "multiplier": 1.5, "not_applicable_to": "packages",
-     "expires": "2026-07-31 23:59"},
+     "expires": "2026-08-31 23:59"},
 ]
 # ====================================================================================
 
