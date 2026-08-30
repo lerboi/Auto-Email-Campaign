@@ -38,18 +38,18 @@ LOCAL_UTC_OFFSET_HOURS = 8     # anione.me local time = UTC+8
 # CODES = token grants (RedeemCodes). `starts`/`expires` are LOCAL "YYYY-MM-DD HH:MM"
 # (omit `starts` to make it live immediately). At least one token field must be > 0.
 CODES = [
-    {"code": "AUG2026",   "image_tokens": 10, "text_tokens": 0,
-     "starts": "2026-07-31 00:00", "expires": "2026-08-31 23:59"},
-    {"code": "AUGVIP30",  "image_tokens": 30, "text_tokens": 0,
-     "starts": "2026-08-24 00:00", "expires": "2026-08-31 23:59"},
-    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Aug 13/17/21).
+    {"code": "SEP2026",   "image_tokens": 10, "text_tokens": 0,
+     "starts": "2026-08-31 00:00", "expires": "2026-09-30 23:59"},
+    {"code": "SEPVIP30",  "image_tokens": 30, "text_tokens": 0,
+     "starts": "2026-09-24 00:00", "expires": "2026-09-30 23:59"},
+    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Sep 13/17/21).
     # Each is a separate code (a redeem code is once-per-user), 20 image tokens, starts a day before its send.
-    {"code": "AUGDROP1", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-08-12 00:00", "expires": "2026-08-31 23:59"},
-    {"code": "AUGDROP2", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-08-16 00:00", "expires": "2026-08-31 23:59"},
-    {"code": "AUGDROP3", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-08-20 00:00", "expires": "2026-08-31 23:59"},
+    {"code": "SEPDROP1", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-09-12 00:00", "expires": "2026-09-30 23:59"},
+    {"code": "SEPDROP2", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-09-16 00:00", "expires": "2026-09-30 23:59"},
+    {"code": "SEPDROP3", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-09-20 00:00", "expires": "2026-09-30 23:59"},
 ]
 
 # VOUCHERS = checkout discounts/multipliers (Vouchers). No start date (live on create).
@@ -59,15 +59,15 @@ CODES = [
 #                      "packages" = token purchases only (a token-pack multiplier)
 #                      None       = applies to both
 VOUCHERS = [
-    {"code": "AUG20",     "description": "August 20% off subscription (day-7)",
+    {"code": "SEP20",      "description": "September 20% off subscription (day-7)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-08-31 23:59"},
-    {"code": "AUGFINAL20", "description": "Final 20% off subscription (finale day-26)",
+     "expires": "2026-09-30 23:59"},
+    {"code": "SEPFINAL20", "description": "Final 20% off subscription (finale day-26)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-08-31 23:59"},
-    {"code": "AUGSURGE",  "description": "August 1.5x token multiplier (day-9/day-10)",
+     "expires": "2026-09-30 23:59"},
+    {"code": "SEPSURGE",   "description": "September 1.5x token multiplier (day-9/day-10)",
      "type": "tokenMultiplier", "multiplier": 1.5, "not_applicable_to": "packages",
-     "expires": "2026-08-31 23:59"},
+     "expires": "2026-09-30 23:59"},
 ]
 # ====================================================================================
 
@@ -179,8 +179,11 @@ def run(create):
         print("\nDry run only — re-run with --create to write these.")
 
 
-def _get_items(ep, page):
-    r = requests.get(f"{BASE_URL}/api/admin/{ep}", params={"page": page}, timeout=30)
+def _get_items(ep, page, search=None):
+    params = {"page": page}
+    if search:
+        params["search"] = search
+    r = requests.get(f"{BASE_URL}/api/admin/{ep}", params=params, timeout=30)
     d = r.json()
     if isinstance(d, list):
         return d, None
@@ -189,23 +192,40 @@ def _get_items(ep, page):
 
 
 def verify(max_pages=40):
-    targets = {c["code"] for c in CODES} | {v["code"] for v in VOUCHERS}
-    found = {}
-    for ep in ("codes", "vouchers"):
-        page = 1
-        while page <= max_pages:
-            items, total_pages = _get_items(ep, page)
-            if not items:
-                break
-            for it in items:
-                if str(it.get("code", "")) in targets:
-                    found[it["code"]] = it
-            if all(t in found for t in targets):
-                break
-            if not total_pages or page >= total_pages:
-                break
-            page += 1
+    """Read back each configured code/voucher and print what the app stored.
 
+    The two endpoints need different strategies. /api/admin/codes returns every
+    row in one response (a few hundred), so a plain page-walk finds everything.
+    /api/admin/vouchers is flooded with auto-generated Wheel vouchers (~28k rows
+    over ~1.4k pages), so walking pages never reaches a campaign voucher and every
+    one falsely reports NOT FOUND. That endpoint supports `?search=`, so query it
+    once per target instead.
+    """
+    found = {}
+
+    code_targets = {c["code"] for c in CODES}
+    page = 1
+    while page <= max_pages and not all(t in found for t in code_targets):
+        items, total_pages = _get_items("codes", page)
+        if not items:
+            break
+        for it in items:
+            if str(it.get("code", "")) in code_targets:
+                found[it["code"]] = it
+        if not total_pages or page >= total_pages:
+            break
+        page += 1
+
+    # Vouchers: one targeted search per code — a page-walk cannot reach them.
+    for v in VOUCHERS:
+        code = v["code"].upper()
+        items, _ = _get_items("vouchers", 1, search=code)
+        for it in items:
+            if str(it.get("code", "")) == code:
+                found[code] = it
+                break
+
+    targets = code_targets | {v["code"].upper() for v in VOUCHERS}
     print("=== stored values ===")
     for code in sorted(targets):
         it = found.get(code)

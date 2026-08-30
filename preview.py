@@ -43,17 +43,17 @@ from deploy_new_year import (
 )
 from sync_contacts import create_segment
 
-# The campaign templates (templates/july/): 6 wave templates + 2 paid-finale templates.
-TEMPLATE_DIRS = [
-    "templates/july/day-1",
-    "templates/july/day-3",
-    "templates/july/day-5",
-    "templates/july/day-7",
-    "templates/july/day-9",
-    "templates/july/day-10",
-    "templates/july/finale-1",
-    "templates/july/finale-2",
-]
+# The campaign templates for the CURRENT month — all 11 slots.
+# ⚠️ RE-POINT THIS AT THE NEW MONTH EVERY ROLLOVER. It fails SILENTLY if you don't:
+# _filter_dirs() matches only the last path segment, so `preview.py day-1` happily
+# tests the previous month's day-1 and reports success. (It sat on templates/july/
+# through the whole August campaign, so August was never actually preview-tested.)
+CAMPAIGN_MONTH = "september"
+TEMPLATE_DIRS = [f"templates/{CAMPAIGN_MONTH}/{slot}" for slot in (
+    "day-1", "day-3", "day-5", "day-7", "day-9", "day-10",
+    "drop-1", "drop-2", "drop-3",      # paid token drops — omitted before, now covered
+    "finale-1", "finale-2",
+)]
 
 THROTTLE_SECONDS = 0.25  # stay under the 5 req/s team rate limit
 TEST_SEGMENT_NAME = "AniOne BROADCAST TEST"  # persistent test segment, membership managed in Resend

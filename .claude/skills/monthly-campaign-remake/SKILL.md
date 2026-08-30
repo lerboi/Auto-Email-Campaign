@@ -81,9 +81,21 @@ Each day's email has a distinct content recipe. Preserve these structural patter
 **CTA link pattern:** `https://www.anione.me/en` (or a more specific page if the feature has one)
 **Key traits:** Most image-heavy template (hero + GIF + optional showcase = 2-3 visuals). 3-item bullet feature list. No promo code. Blue color scheme.
 
-**Previous feature topics used:**
-- March 2026: Custom Characters ("She's exactly who you want her to be")
-- July/August 2026: New Characters ("meet the lineup")
+**Previous feature topics used — keep this list current, it is how repetition gets caught:**
+| Month | day-3 topic |
+|---|---|
+| March 2026 | Custom Character Creator ("She's exactly who you want her to be") |
+| April 2026 | Voice Calls launch |
+| May 2026 | Voice Calls (late-night angle) |
+| June 2026 | Natural Mode image-quality upgrade |
+| July 2026 | New Characters ("meet the July lineup") |
+| August 2026 | New Characters (near-verbatim rewrite of July) |
+| September 2026 | New Characters ("Longer nights deserve better company") |
+
+⚠️ **New Characters has now held a showcase slot four months running** (Jun day-5, Jul/Aug/Sep day-3).
+Longest-rested previously-used angles: Custom Character Creator and Custom Scenarios (unused since March);
+Voice Calls (since May). **Never headlined at all:** the Image Generation toolkit (Standard/Advanced/Natural
+modes, batch 1–5, prompt library, presets) and 25-level Relationship Progression.
 
 ---
 
@@ -106,9 +118,19 @@ Each day's email has a distinct content recipe. Preserve these structural patter
 **CTA link pattern:** `https://www.anione.me/en` (or a more specific page, e.g. `/en/Wheel` for Streak Rewards)
 **Key traits:** Longer feature list (5 bullets vs. Day 3's 3). Has GIF but typically no showcase image (2 visuals). No promo code. Purple color scheme. Box title is themed to the month, not just the feature name.
 
-**Previous feature topics used:**
-- March 2026: Custom Scenarios ("Your World. Your Story. Your Rules.")
-- July/August 2026: Streak Rewards on the daily Wheel ("Spin daily, stack chests")
+**Previous feature topics used — keep this list current:**
+| Month | day-5 topic |
+|---|---|
+| March 2026 | Custom Scenarios ("Your World. Your Story. Your Rules.") |
+| April 2026 | Voice Calls deep dive (memory + Relationship Milestones) |
+| May 2026 | Voice Calls deep dive (tone / Bond Progression / Background Mode) |
+| June 2026 | New Characters (June lineup) |
+| July 2026 | Streak Rewards on the daily Wheel |
+| August 2026 | Streak Rewards (same five bullet labels as July) |
+| September 2026 | Streak Rewards (rewritten as a nightly autumn ritual) |
+
+⚠️ **Streak Rewards has now held day-5 three months running.** See the day-3 note for rested and
+never-used angles.
 
 ---
 
@@ -284,13 +306,47 @@ Plus the updated `CAMPAIGN_MAP` dates.
 
 ### Step 6: Go-live checklist
 
+**Run these in order — the order is load-bearing.** (A previous version of this list had `--fresh` at step 3
+and the broadcast test at step 4, which destroys the test audience before you can test.)
+
 1. `mail.anione.me` sending domain is `verified` in Resend (DKIM/SPF/MX).
-2. `python create_codes.py --create` (then `--verify`) — codes exist in the app.
-3. `python sync_contacts.py --fresh` — **after** the prior finale — loads the 5 CSVs into segments A–E. A clean run reports `N created, 0 existed, 0 failed`.
-4. `python preview.py --broadcast` — real test send to the `AniOne BROADCAST TEST` segment. **Run it before the `--fresh` wipe** (which empties the test segment), and note `TEMPLATE_DIRS` covers `day-*`/`finale-*` but **not `drop-*`** — add the drop dirs there to test those too.
-5. `RESEND_API_KEY` + `RESEND_SEGMENT_A`…`E` set in Railway **and** `.env`.
-6. Every `template.html`/`template.txt` footer still has `{{{RESEND_UNSUBSCRIBE_URL}}}`.
-7. The Railway cron runs `deploy_new_year.py` daily and sends each `CAMPAIGN_MAP` date automatically — no manual send.
+2. **`python create_codes.py --create`, then `--verify`.** ⏰ *This is the only step with a wall-clock
+   deadline:* the app rejects a `startsAt` in the past, so it must run **before the earliest `starts` date**
+   in CONFIG (following the day-before convention, that's the day before the month begins, in UTC+8).
+   Miss it and only the day-1 gift code fails — everything else starts mid-month and succeeds, so the
+   breakage is a single quiet line in the summary. Check the `Done: N created, N already existed, N failed`
+   tally, not just the absence of red.
+3. **Confirm expiry dates match the month's real length.** All 8 entries expire end-of-month, and a
+   mechanical month bump produces things like `2026-09-31` (Sep/Apr/Jun/Nov have 30 days; Feb has 28/29).
+   `strptime` raises `ValueError` and `run()` exits **before creating anything**, with a message that does
+   not name the offending entry.
+4. **Re-point `preview.py`** — set `CAMPAIGN_MONTH` to the new month. It fails *silently* otherwise:
+   `_filter_dirs()` matches only the last path segment, so `preview.py day-1` happily tests last month's
+   day-1 and reports success. (It sat on `templates/july/` through the whole August campaign.)
+5. **Add test recipients to the `AniOne BROADCAST TEST` segment** in the Resend dashboard. It is almost
+   always empty, because step 7's `--fresh` wipes every contact in the account — including this segment's.
+6. **`python preview.py --broadcast`** — real test send. Trust the polled terminal status (`sent`/`failed`),
+   not the create call's 2xx, which only means *accepted*. **Must run before step 7.**
+7. **`python sync_contacts.py --fresh`** — **only after the prior month's day-26 finale has fired**, and
+   only if the CSVs actually changed. Budget **~80–90 minutes** and run it in your **own terminal**
+   (a harness background job gets killed around 10 minutes, leaving Resend half-wiped). A clean run reports
+   `N created, 0 already existed, 0 invalid, 0 failed`.
+   - ⚠️ **Never run `--create`** on an existing setup — it unconditionally creates five *new* duplicate
+     segments and prints IDs you might paste over the working ones.
+   - If the lists did **not** change, **skip the sync entirely**. Do not run a plain `sync_contacts.py`
+     "just to be safe": every contact comes back `exists`, and it prints a loud warning and `exit(1)` even
+     though nothing is wrong.
+8. **Re-add the test recipients** (step 7 wiped them again).
+9. `RESEND_API_KEY` + `RESEND_SEGMENT_A`…`E` set in Railway **and** `.env`.
+10. Every `template.html`/`template.txt` footer still has `{{{RESEND_UNSUBSCRIBE_URL}}}` — exactly once each.
+11. **`git commit && git push origin main`, then confirm Railway shows a new SUCCESS deployment on that
+    commit.** ⏰ **This is the actual go-live step and it is easy to forget.** The cron reads templates from
+    the *deployed container's* filesystem, so local files change nothing until the build lands. Push by the
+    **last day of the prior month** — the cron fires 03:01–03:04 UTC, and a build still running at 03:01 on
+    day 1 means the old deployment runs and prints "No campaign scheduled."
+12. Day 1, ~03:05 UTC: read the Railway deploy logs to confirm the first send. With
+    `restartPolicyType: NEVER`, no healthcheck and no alerting, **a failed build or failed send is
+    completely silent** — nobody is paged.
 
 ## Writing Guidelines for Email Copy
 
@@ -318,6 +374,18 @@ base-templates/
 ```
 
 Replace all `{{PLACEHOLDER}}` vars (see `references/placeholder-variables.md`) and write to `templates/{month}/day-N/`. **There are no skeletons for `drop-*` or `finale-*`** — generate those from the previous month's actual templates.
+
+> ⚠️ **Substitution trap:** every skeleton contains the literal `{{{RESEND_UNSUBSCRIBE_URL}}}` — a *triple*-brace
+> Resend runtime token. A naive `{{VAR}}` regex pass matches its inner braces and silently corrupts it,
+> breaking managed unsubscribe (a compliance requirement) in all 12 skeleton-derived files. Exclude it
+> explicitly, then verify it survives with `grep -c -F '{{{RESEND_UNSUBSCRIBE_URL}}}'` — the count must be
+> exactly 1 in every `.html` and every `.txt`.
+
+> ⚠️ **The skeletons have drifted from what actually ships.** `feature-showcase-day-3/5` are built around a
+> `{{GIF_URL}}` inline GIF that July–September's templates do not use (day-3 ships a 2×2 static image gallery,
+> day-5 a single showcase image). Seeding from the skeleton produces a structurally different email than the
+> last three months shipped. Conversely the skeletons are *ahead* on one thing — all six carry the
+> `[data-ogsc]` Outlook dark-mode fix that most shipped templates were missing. Take that from them.
 
 **Best practices baked into the skeletons:** Outlook dark-mode fix (`[data-ogsc]`), 600px mobile breakpoint, preheader div, MSO table attributes, `role="presentation"`, image alt text, the `{{{RESEND_UNSUBSCRIBE_URL}}}` footer, and fully inline styles (no external CSS).
 

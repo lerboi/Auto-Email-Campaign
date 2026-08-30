@@ -10,9 +10,10 @@ Automated email campaign system for **AniOne** (anione.me) that sends marketing 
 
 - **`deploy_new_year.py`** — Active campaign dispatcher (runs daily via Railway cron). Uses a date-keyed `CAMPAIGN_MAP` to determine which local template folder and which Resend Segment to send for a given day. Reads the template's HTML/text/Subject from disk and sends it as a Resend **Broadcast** (create + send in one API call). The schedule is a two-wave + paid-finale design across **five segments (A–E)** — see **Monthly Campaign Structure** below.
 - **`sync_contacts.py`** — Pushes the `email/` CSV lists into the five Resend Segments (`RESEND_SEGMENT_A`…`E`), creating each unique contact **once with the full set of segments it belongs to** (so a paid user in both Segment A and E is one contact, billed once). CSVs remain the source of truth; run once per month after updating lists. `--create` creates all five segments and prints IDs; `--fresh` deletes all contacts first — **required whenever segment membership changes**, since Resend only sets a contact's segments on creation. (No bulk-import API — contacts are created one-by-one, throttled under 5 req/s.)
-- **`send_daily.py`** — Legacy multi-phase campaign script (Christmas campaign). Sends to VIP list first, waits 90 minutes for IP warmup, then sends to cold list. Run manually with `--day N` flag.
-- **`scrub_lists.py`** — Interactive email list cleaner. Validates emails (syntax + MX records via `email_validator`), filters bot patterns (+ aliases, excessive dots). Reads from and writes `CLEANED_` prefixed files to `email/` folder.
-- **`remove_duplicates.py`** — Deduplicates CSV email lists with Gmail normalization (dot/plus-alias handling). Hardcoded `INPUT_FILE`/`OUTPUT_FILE` paths must be edited per use.
+- **`clean_list.py`** — **The list-cleaning entry point.** Interactive picker over `email/*.csv`, then a two-step pipeline: dedupe → scrub. Writes `<name>_CLEANED.csv` into `email/` and prints a per-reason breakdown. Note its picker *hides* files already named `CLEANED_*` or `*_cleaned.csv`, so drop new raw exports in **without** a `_CLEANED` suffix or they won't appear.
+- **`clean_tools/scrub_lists.py`** — Library used by `clean_list.py`: `normalize_and_validate()` (syntax + MX via `email_validator`, disposable domains, spam TLDs, role prefixes, plus-aliases, excessive dots, gibberish detection). Its own `main()` is legacy.
+- **`clean_tools/remove_duplicates.py`** — Library: `normalize_email()` (Gmail dot/plus-alias normalization). Its standalone `main()` points at a file that no longer exists — use `clean_list.py` instead.
+- **`preview.py`** — Pre-flight test sender (see "Previewing & Broadcast Testing" below). Its `CAMPAIGN_MONTH`/`TEMPLATE_DIRS` must be re-pointed at the new month every rollover.
 - **`test.py`** — Scratch file for formatting raw email lists; not a test suite.
 - **`email/`** — CSV files containing user email lists segmented by signup date and payment status. Column header is `email` (lowercase) in newer files.
 
@@ -27,7 +28,7 @@ Each month's campaign runs ~26 days in three phases on the daily cron (`CAMPAIGN
 | **Paid token drops** | 13, 17, 21 | Segment E | paid only — 3 "care package" gift emails (20 image tokens each) filling the paid gap |
 | **Paid finale** | 25–26 | Segment E | paid only (2 dedicated finale templates) |
 
-The 6 wave templates (`day-1,3,5,7,9,10`) rotate A→B in Wave 1, then again C→D in Wave 2; the finale uses `finale-1` (gift) + `finale-2` (sale) sent to Segment E. The 3 paid drops use `drop-1/2/3` (codes `DROP1/2/3`). Segment IDs are env vars `RESEND_SEGMENT_A`…`RESEND_SEGMENT_E`.
+The 6 wave templates (`day-1,3,5,7,9,10`) rotate A→B in Wave 1, then again C→D in Wave 2; the finale uses `finale-1` (gift) + `finale-2` (sale) sent to Segment E. The 3 paid drops use `drop-1/2/3` (codes `{MON}DROP1/2/3`, e.g. `SEPDROP1`). **Every code string must carry the month prefix.** July shipped bare `DROP1/2/3`, `PREMIUM30` and `FINAL20`; those strings are now permanently consumed in the app's `RedeemCodes`/`Vouchers` tables and cannot be reused. Segment IDs are env vars `RESEND_SEGMENT_A`…`RESEND_SEGMENT_E`.
 
 **Multiple sends per day:** a `CAMPAIGN_MAP` date may map to a **single send dict OR a list of send dicts** — e.g. Jul 13/17/21 each fire a Wave 2 free send *and* a paid token-drop. `main()` dispatches each send for the day.
 
@@ -81,11 +82,11 @@ python sync_contacts.py
 # Sync but clear ALL contacts first — required when segment membership changes
 python sync_contacts.py --fresh
 
-# Clean email lists (interactive file selector)
-python scrub_lists.py
+# Clean email lists (interactive file selector: dedupe + scrub in one pass)
+python clean_list.py
 
-# Deduplicate emails (edit INPUT_FILE/OUTPUT_FILE in script first)
-python remove_duplicates.py
+# Sync but don't fail when a configured segment resolves to zero emails
+python sync_contacts.py --allow-empty
 ```
 
 ## Previewing & Broadcast Testing (`preview.py`)
