@@ -20,10 +20,12 @@ Schedules below are LOCAL wall-clock time (anione.me = UTC+8). The script conver
 to the exact format each endpoint stores: codes -> UTC ISO (+00:00); vouchers ->
 naive local ISO. That mirrors what the admin dashboard writes.
 """
+import os
 import sys
 import json
 import requests
 from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
 
 # Force UTF-8 stdout so emoji status lines don't crash on Windows (cp1252) consoles.
 try:
@@ -38,18 +40,18 @@ LOCAL_UTC_OFFSET_HOURS = 8     # anione.me local time = UTC+8
 # CODES = token grants (RedeemCodes). `starts`/`expires` are LOCAL "YYYY-MM-DD HH:MM"
 # (omit `starts` to make it live immediately). At least one token field must be > 0.
 CODES = [
-    {"code": "SEP2026",   "image_tokens": 10, "text_tokens": 0,
-     "starts": "2026-08-31 00:00", "expires": "2026-09-30 23:59"},
-    {"code": "SEPVIP30",  "image_tokens": 30, "text_tokens": 0,
-     "starts": "2026-09-24 00:00", "expires": "2026-09-30 23:59"},
-    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Sep 13/17/21).
+    {"code": "OCT2026",   "image_tokens": 10, "text_tokens": 0,
+     "starts": "2026-09-30 00:00", "expires": "2026-10-31 23:59"},
+    {"code": "OCTVIP30",  "image_tokens": 30, "text_tokens": 0,
+     "starts": "2026-10-24 00:00", "expires": "2026-10-31 23:59"},
+    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Oct 13/17/21).
     # Each is a separate code (a redeem code is once-per-user), 20 image tokens, starts a day before its send.
-    {"code": "SEPDROP1", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-09-12 00:00", "expires": "2026-09-30 23:59"},
-    {"code": "SEPDROP2", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-09-16 00:00", "expires": "2026-09-30 23:59"},
-    {"code": "SEPDROP3", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-09-20 00:00", "expires": "2026-09-30 23:59"},
+    {"code": "OCTDROP1", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-10-12 00:00", "expires": "2026-10-31 23:59"},
+    {"code": "OCTDROP2", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-10-16 00:00", "expires": "2026-10-31 23:59"},
+    {"code": "OCTDROP3", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-10-20 00:00", "expires": "2026-10-31 23:59"},
 ]
 
 # VOUCHERS = checkout discounts/multipliers (Vouchers). No start date (live on create).
@@ -59,19 +61,57 @@ CODES = [
 #                      "packages" = token purchases only (a token-pack multiplier)
 #                      None       = applies to both
 VOUCHERS = [
-    {"code": "SEP20",      "description": "September 20% off subscription (day-7)",
+    {"code": "OCT20",      "description": "October 20% off subscription (day-7)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-09-30 23:59"},
-    {"code": "SEPFINAL20", "description": "Final 20% off subscription (finale day-26)",
+     "expires": "2026-10-31 23:59"},
+    {"code": "OCTFINAL20", "description": "Final 20% off subscription (finale day-26)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-09-30 23:59"},
-    {"code": "SEPSURGE",   "description": "September 1.5x token multiplier (day-9/day-10)",
+     "expires": "2026-10-31 23:59"},
+    {"code": "OCTSURGE",   "description": "October 1.5x token multiplier (day-9/day-10)",
      "type": "tokenMultiplier", "multiplier": 1.5, "not_applicable_to": "packages",
-     "expires": "2026-09-30 23:59"},
+     "expires": "2026-10-31 23:59"},
 ]
 # ====================================================================================
 
 LOCAL_TZ = timezone(timedelta(hours=LOCAL_UTC_OFFSET_HOURS))
+
+# --- ADMIN AUTH ---------------------------------------------------------------
+# Every /api/admin/* route except login/logout is gated by animechat-ai's
+# middleware (src/middleware.js), which requires the HttpOnly `admin_session`
+# cookie issued by POST /api/admin/login. Unauthenticated calls now get 401 on
+# BOTH GET and POST, so this script logs in once and reuses the cookie via a
+# Session. (These endpoints used to be open — that was the security gap noted in
+# CLAUDE.md, since closed. An older copy of this script fails with
+# {"error":"Unauthorized"}.)
+load_dotenv()
+ADMIN_USERNAME = os.getenv("ANIONE_ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ANIONE_ADMIN_PASSWORD")
+
+SESSION = requests.Session()
+
+
+def login():
+    """Authenticate and store the admin_session cookie on SESSION."""
+    if not (ADMIN_USERNAME and ADMIN_PASSWORD):
+        print("ERROR: ANIONE_ADMIN_USERNAME / ANIONE_ADMIN_PASSWORD missing from .env.")
+        print("       The admin API requires a login now (401 otherwise).")
+        sys.exit(1)
+    try:
+        r = SESSION.post(
+            BASE_URL + "/api/admin/login",
+            json={"username": ADMIN_USERNAME, "password": ADMIN_PASSWORD},
+            timeout=30,
+        )
+    except Exception as e:
+        print("ERROR: login network error: " + str(e))
+        sys.exit(1)
+    if not (200 <= r.status_code < 300):
+        print("ERROR: admin login failed (HTTP %s): %s" % (r.status_code, r.text[:160]))
+        sys.exit(1)
+    if "admin_session" not in SESSION.cookies:
+        print("ERROR: login returned 2xx but set no admin_session cookie.")
+        sys.exit(1)
+    print("Authenticated as %s\n" % ADMIN_USERNAME)
 
 
 def _parse_local(s):
@@ -151,6 +191,9 @@ def run(create):
         print(f"CONFIG ERROR: {e}")
         sys.exit(1)
 
+    if create:
+        login()
+
     created = skipped = failed = 0
     for ep, payload in plan:
         print(f"[{ep}] {payload['code']}")
@@ -158,7 +201,7 @@ def run(create):
         if not create:
             continue
         try:
-            r = requests.post(f"{BASE_URL}/api/admin/{ep}", json=payload, timeout=30)
+            r = SESSION.post(f"{BASE_URL}/api/admin/{ep}", json=payload, timeout=30)
         except Exception as e:
             failed += 1
             print(f"   ❌ network error: {e}")
@@ -183,7 +226,7 @@ def _get_items(ep, page, search=None):
     params = {"page": page}
     if search:
         params["search"] = search
-    r = requests.get(f"{BASE_URL}/api/admin/{ep}", params=params, timeout=30)
+    r = SESSION.get(f"{BASE_URL}/api/admin/{ep}", params=params, timeout=30)
     d = r.json()
     if isinstance(d, list):
         return d, None
@@ -201,6 +244,7 @@ def verify(max_pages=40):
     one falsely reports NOT FOUND. That endpoint supports `?search=`, so query it
     once per target instead.
     """
+    login()
     found = {}
 
     code_targets = {c["code"] for c in CODES}
