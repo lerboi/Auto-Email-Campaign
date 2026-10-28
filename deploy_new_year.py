@@ -40,20 +40,20 @@ SEGMENT_E = os.getenv("RESEND_SEGMENT_E")  # Paid finale (E)
 # (newsletter = true). Paid users (E) appear in BOTH Segment A (Wave 1 main) and
 # Segment E (finale) — that's one contact in two segments, billed once.
 GROUP_A_FILES = [
-    os.path.join(EMAIL_FOLDER, "August2026_2_Free_CLEANED.csv"),  # free A (1888, smallest — paired with paid)
-    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),               # paid (E) rides Wave 1
+    os.path.join(EMAIL_FOLDER, "October2026_Free_CLEANED.csv"),  # free A (1502, Oct 2026 signups, first half — paired with paid)
+    os.path.join(EMAIL_FOLDER, "PaidNoPackage.csv"),             # paid (E) rides Wave 1
 ]
 GROUP_B_FILES = [
-    os.path.join(EMAIL_FOLDER, "August2026_1_Free_CLEANED.csv"),  # free B (1900)
+    os.path.join(EMAIL_FOLDER, "October2026_2_Free_CLEANED.csv"),  # free B (1531, Oct 2026 signups, second half)
 ]
 GROUP_C_FILES = [
-    os.path.join(EMAIL_FOLDER, "Free_Sept2026_CLEANED.csv"),  # free C (2966, Wave 2 — Sep 2026 signups, never mailed)
+    os.path.join(EMAIL_FOLDER, "July2026_Free_CLEANED.csv"),  # free C (2284, Wave 2 — Jul 2026 cohort, last mailed in Sept)
 ]
 GROUP_D_FILES = [
-    os.path.join(EMAIL_FOLDER, "October2025_Free_CLEANED.csv"),  # free D (2456, Wave 2 — Oct 2025 cohort, rested 8 months)
+    os.path.join(EMAIL_FOLDER, "Free_Sept2026_CLEANED.csv"),  # free D (2854, Wave 2 — Sep 2026 cohort, last mailed Oct 23)
 ]
 GROUP_E_FILES = [
-    os.path.join(EMAIL_FOLDER, "Paid_CLEANED.csv"),  # paid (finale + Wave 1 ride-along)
+    os.path.join(EMAIL_FOLDER, "PaidNoPackage.csv"),  # paid (838, uncleaned by choice — finale + Wave 1 ride-along)
 ]
 
 # --- JULY CAMPAIGN MAPPING ($80/10k tier: all segments pre-loaded, no resets) ---
@@ -215,6 +215,45 @@ CAMPAIGN_MAP = {
     # ---- PAID FINALE (Oct 25-26): Seg E only, dedicated finale templates ----
     "2026-10-25": {"template_dir": "templates/october/finale-1", "segment": SEGMENT_E},  # premium 30-token gift
     "2026-10-26": {"template_dir": "templates/october/finale-2", "segment": SEGMENT_E},  # final 20% off
+
+    # ================= NOVEMBER CAMPAIGN (2026-11) =================
+    # Same 5-segment design. November has 30 days, so campaign codes expire
+    # 2026-11-30 (see create_codes.py). Re-sync the November lists with the
+    # contact sync ONLY AFTER the Oct 25-26 finale has fired.
+    # ---- WAVE 1 (Nov 1-12): free A/B + paid, A->B alternating ----
+    "2026-11-01": {"template_dir": "templates/november/day-1",  "segment": SEGMENT_A},
+    "2026-11-02": {"template_dir": "templates/november/day-1",  "segment": SEGMENT_B},
+    "2026-11-03": {"template_dir": "templates/november/day-3",  "segment": SEGMENT_A},
+    "2026-11-04": {"template_dir": "templates/november/day-3",  "segment": SEGMENT_B},
+    "2026-11-05": {"template_dir": "templates/november/day-5",  "segment": SEGMENT_A},
+    "2026-11-06": {"template_dir": "templates/november/day-5",  "segment": SEGMENT_B},
+    "2026-11-07": {"template_dir": "templates/november/day-7",  "segment": SEGMENT_A},
+    "2026-11-08": {"template_dir": "templates/november/day-7",  "segment": SEGMENT_B},
+    "2026-11-09": {"template_dir": "templates/november/day-9",  "segment": SEGMENT_A},
+    "2026-11-10": {"template_dir": "templates/november/day-9",  "segment": SEGMENT_B},
+    "2026-11-11": {"template_dir": "templates/november/day-10", "segment": SEGMENT_A},
+    "2026-11-12": {"template_dir": "templates/november/day-10", "segment": SEGMENT_B},
+
+    # ---- WAVE 2 (Nov 13-24): free C/D, C->D alternating; paid drops on 13/17/21 to E ----
+    "2026-11-13": [{"template_dir": "templates/november/day-1",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/november/drop-1", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-11-14": {"template_dir": "templates/november/day-1",  "segment": SEGMENT_D},
+    "2026-11-15": {"template_dir": "templates/november/day-3",  "segment": SEGMENT_C},
+    "2026-11-16": {"template_dir": "templates/november/day-3",  "segment": SEGMENT_D},
+    "2026-11-17": [{"template_dir": "templates/november/day-5",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/november/drop-2", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-11-18": {"template_dir": "templates/november/day-5",  "segment": SEGMENT_D},
+    "2026-11-19": {"template_dir": "templates/november/day-7",  "segment": SEGMENT_C},
+    "2026-11-20": {"template_dir": "templates/november/day-7",  "segment": SEGMENT_D},
+    "2026-11-21": [{"template_dir": "templates/november/day-9",  "segment": SEGMENT_C},
+                   {"template_dir": "templates/november/drop-3", "segment": SEGMENT_E}],  # + paid token drop (20 img)
+    "2026-11-22": {"template_dir": "templates/november/day-9",  "segment": SEGMENT_D},
+    "2026-11-23": {"template_dir": "templates/november/day-10", "segment": SEGMENT_C},
+    "2026-11-24": {"template_dir": "templates/november/day-10", "segment": SEGMENT_D},
+
+    # ---- PAID FINALE (Nov 25-26): Seg E only, dedicated finale templates ----
+    "2026-11-25": {"template_dir": "templates/november/finale-1", "segment": SEGMENT_E},  # premium 30-token gift
+    "2026-11-26": {"template_dir": "templates/november/finale-2", "segment": SEGMENT_E},  # final 20% off
 }
 
 

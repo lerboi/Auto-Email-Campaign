@@ -1,0 +1,21 @@
+Most people use a tenth of the generator.
+
+Three generation modes, five images at a go, and a prompt library doing the hard part for you.
+
+The image generator has three different modes, and the one you land on by default is the simplest of them. There is a fair amount sitting behind it that never gets opened.
+
+[4 images generated on Anione shown in the email]
+
+Standard is the quick one. Advanced gives you the controls - composition, detail, how hard the model leans on your prompt. Natural Language means you describe the picture in a sentence and let it work the rest out. Pick wrong and you reroll; pick right and you get it first time.
+
+WHAT'S ACTUALLY IN THERE:
+- Three Modes, Different Jobs: Standard for speed, Advanced for control, Natural Language for describing it the way you would to a person.
+- Five At Once: Batch up to five images in one go, then keep the one that worked instead of rerolling the same prompt over and over.
+- The Prompt Library: Saved prompts and presets, so the thing that worked last week is one tap away rather than something you half-remember.
+
+Open the Generator: https://www.anione.me/en
+
+Ten minutes in Advanced mode will spoil you for the quick one.
+
+(c) 2026 Anione. All rights reserved.
+Unsubscribe: {{{RESEND_UNSUBSCRIBE_URL}}}

@@ -48,7 +48,7 @@ from sync_contacts import create_segment
 # _filter_dirs() matches only the last path segment, so `preview.py day-1` happily
 # tests the previous month's day-1 and reports success. (It sat on templates/july/
 # through the whole August campaign, so August was never actually preview-tested.)
-CAMPAIGN_MONTH = "october"
+CAMPAIGN_MONTH = "november"
 TEMPLATE_DIRS = [f"templates/{CAMPAIGN_MONTH}/{slot}" for slot in (
     "day-1", "day-3", "day-5", "day-7", "day-9", "day-10",
     "drop-1", "drop-2", "drop-3",      # paid token drops — omitted before, now covered

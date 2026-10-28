@@ -40,18 +40,18 @@ LOCAL_UTC_OFFSET_HOURS = 8     # anione.me local time = UTC+8
 # CODES = token grants (RedeemCodes). `starts`/`expires` are LOCAL "YYYY-MM-DD HH:MM"
 # (omit `starts` to make it live immediately). At least one token field must be > 0.
 CODES = [
-    {"code": "OCT2026",   "image_tokens": 10, "text_tokens": 0,
-     "starts": "2026-09-30 00:00", "expires": "2026-10-31 23:59"},
-    {"code": "OCTVIP30",  "image_tokens": 30, "text_tokens": 0,
-     "starts": "2026-10-24 00:00", "expires": "2026-10-31 23:59"},
-    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Oct 13/17/21).
+    {"code": "NOV2026",   "image_tokens": 10, "text_tokens": 0,
+     "starts": "2026-10-31 00:00", "expires": "2026-11-30 23:59"},
+    {"code": "NOVVIP30",  "image_tokens": 30, "text_tokens": 0,
+     "starts": "2026-11-24 00:00", "expires": "2026-11-30 23:59"},
+    # Paid token "care package" drops (Wave-2 window, sent to Segment E on Nov 13/17/21).
     # Each is a separate code (a redeem code is once-per-user), 20 image tokens, starts a day before its send.
-    {"code": "OCTDROP1", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-10-12 00:00", "expires": "2026-10-31 23:59"},
-    {"code": "OCTDROP2", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-10-16 00:00", "expires": "2026-10-31 23:59"},
-    {"code": "OCTDROP3", "image_tokens": 20, "text_tokens": 0,
-     "starts": "2026-10-20 00:00", "expires": "2026-10-31 23:59"},
+    {"code": "NOVDROP1", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-11-12 00:00", "expires": "2026-11-30 23:59"},
+    {"code": "NOVDROP2", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-11-16 00:00", "expires": "2026-11-30 23:59"},
+    {"code": "NOVDROP3", "image_tokens": 20, "text_tokens": 0,
+     "starts": "2026-11-20 00:00", "expires": "2026-11-30 23:59"},
 ]
 
 # VOUCHERS = checkout discounts/multipliers (Vouchers). No start date (live on create).
@@ -61,15 +61,15 @@ CODES = [
 #                      "packages" = token purchases only (a token-pack multiplier)
 #                      None       = applies to both
 VOUCHERS = [
-    {"code": "OCT20",      "description": "October 20% off subscription (day-7)",
+    {"code": "NOV20",      "description": "November 20% off subscription (day-7)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-10-31 23:59"},
-    {"code": "OCTFINAL20", "description": "Final 20% off subscription (finale day-26)",
+     "expires": "2026-11-30 23:59"},
+    {"code": "NOVFINAL20", "description": "Final 20% off subscription (finale day-26)",
      "type": "tokenDiscount", "percent_off": 20, "not_applicable_to": "tokens",
-     "expires": "2026-10-31 23:59"},
-    {"code": "OCTSURGE",   "description": "October 1.5x token multiplier (day-9/day-10)",
+     "expires": "2026-11-30 23:59"},
+    {"code": "NOVSURGE",   "description": "November 1.5x token multiplier (day-9/day-10)",
      "type": "tokenMultiplier", "multiplier": 1.5, "not_applicable_to": "packages",
-     "expires": "2026-10-31 23:59"},
+     "expires": "2026-11-30 23:59"},
 ]
 # ====================================================================================
 

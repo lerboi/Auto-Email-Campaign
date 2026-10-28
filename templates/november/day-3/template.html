@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   The Whole Image Toolkit
+  </title>
+  <style>
+   /* RESET STYLES */
+   body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; height: 100% !important; }
+   body, table, td, div, p, a { -webkit-font-smoothing: antialiased; text-size-adjust: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; line-height: 100%; }
+   table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; border-spacing: 0; }
+   img { border: 0; line-height: 100%; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
+   /* GENERAL TYPOGRAPHY */
+   body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; color: #333333; }
+   /* MOBILE STYLES */
+   @media screen and (max-width: 600px) { .button { width: 100% !important; display: block !important; }
+    .email-container { width: 100% !important; margin: auto !important; }
+    .fluid-img { width: 100% !important; max-width: 100% !important; height: auto !important; }
+    .mobile-padding { padding-left: 20px !important; padding-right: 20px !important; }
+    .header-text { font-size: 24px !important; line-height: 30px !important; }
+    .body-text { font-size: 16px !important; line-height: 24px !important; }
+   }
+   /* DARK MODE SUPPORT */
+   @media (prefers-color-scheme: dark) {
+    body { background-color: #1a1a1a !important; color: #ffffff !important; }
+    .email-bg { background-color: #1a1a1a !important; }
+    .content-bg { background-color: #2d2d2d !important; color: #ffffff !important; }
+    h1, p, .text-adaptive { color: #ffffff !important; }
+    /* The feature box keeps its light #eff6ff background in dark mode, so its
+       text must stay DARK (otherwise it's light-on-light and unreadable).
+       These MUST match this template's own inline box colors: title #1e40af, body #111827. */
+    .force-dark-title { color: #1e40af !important; }
+    .force-dark-text { color: #111827 !important; }
+   }
+   /* OUTLOOK DARK MODE FIX */
+   [data-ogsc] .content-bg { background-color: #2d2d2d !important; color: #ffffff !important; }
+   [data-ogsc] .text-adaptive { color: #ffffff !important; }
+   /* Keep the light feature box readable in Outlook dark mode too. */
+   [data-ogsc] .force-dark-title { color: #1e40af !important; }
+   [data-ogsc] .force-dark-text { color: #111827 !important; }
+  </style>
+ </head>
+ <body style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly; background-color: #f4f4f4;" width="100%">
+  <!-- PREHEADER -->
+  <div style="display:none; font-size:1px; line-height:1px; max-height:0px; max-width:0px; opacity:0; overflow:hidden; mso-hide:all; font-family: sans-serif;">
+   Three generation modes, five images at a go, and a prompt library doing the hard part for you.
+  
+   &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>
+  <center class="email-bg" style="width: 100%; background-color: #f4f4f4;">
+   <table align="center" border="0" cellpadding="0" cellspacing="0" class="email-container" role="presentation" style="margin: auto; border-top: 4px solid #3b82f6;" width="600">
+    <!-- LOGO -->
+    <tr>
+     <td style="padding: 20px 0; text-align: center;">
+      <a href="https://www.anione.me">
+       <img alt="Anione Logo" height="64" src="https://www.anione.me/circle_icon.ico" style="display: block; margin: 0 auto; border: 0; border-radius: 50%;" width="64"/>
+      </a>
+     </td>
+    </tr>
+    <!-- HERO IMAGE -->
+    <tr>
+     <td class="content-bg" style="background-color: #ffffff; padding: 0;">
+      <a href="https://www.anione.me/en">
+       <img alt="Images generated on Anione" class="fluid-img" src="https://www.anione.me/Emails/day3/image-hero.webp" style="width: 100%; max-width: 600px; height: auto; display: block;" width="600"/>
+      </a>
+     </td>
+    </tr>
+    <!-- BODY CONTENT -->
+    <tr>
+     <td class="content-bg mobile-padding" style="background-color: #ffffff; padding: 40px 30px;">
+      <!-- HEADING -->
+      <h1 class="header-text" style="margin: 0 0 15px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 26px; line-height: 32px; color: #333333; font-weight: bold; text-align: center;">
+       Most people use a tenth of the generator.
+      </h1>
+      <!-- INTRO PARAGRAPH (centered) -->
+      <p class="body-text" style="margin: 0 0 20px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555; text-align: center;">
+       <strong>The image generator</strong> has three different modes, and the one you land on by default is the simplest of them. There is a fair amount sitting behind it that never gets opened.
+      </p>
+      <!-- 4-IMAGE SHOWCASE GALLERY -->
+      <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin: 25px 0;">
+       <tr>
+        <td width="50%" style="padding: 0 5px 10px 0;">
+         <img alt="An image generated on Anione" class="fluid-img" height="395" src="https://www.anione.me/Emails/day3/5.webp" style="width: 100%; max-width: 270px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block; aspect-ratio: 832 / 1216;" width="270"/>
+        </td>
+        <td width="50%" style="padding: 0 0 10px 5px;">
+         <img alt="An image generated on Anione" class="fluid-img" height="395" src="https://www.anione.me/Emails/day3/10.webp" style="width: 100%; max-width: 270px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block; aspect-ratio: 832 / 1216;" width="270"/>
+        </td>
+       </tr>
+       <tr>
+        <td width="50%" style="padding: 0 5px 0 0;">
+         <img alt="An image generated on Anione" class="fluid-img" height="395" src="https://www.anione.me/Emails/day3/7.webp" style="width: 100%; max-width: 270px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block; aspect-ratio: 832 / 1216;" width="270"/>
+        </td>
+        <td width="50%" style="padding: 0 0 0 5px;">
+         <img alt="An image generated on Anione" class="fluid-img" height="395" src="https://www.anione.me/Emails/day3/9.webp" style="width: 100%; max-width: 270px; height: auto; border-radius: 8px; border: 1px solid #eeeeee; display: block; aspect-ratio: 832 / 1216;" width="270"/>
+        </td>
+       </tr>
+      </table>
+      <!-- DETAIL PARAGRAPH (left-aligned) -->
+      <p class="body-text" style="margin: 0 0 25px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555; text-align: left;">
+       Standard is the quick one. Advanced gives you the controls &mdash; composition, detail, how hard the model leans on your prompt. Natural Language means you describe the picture in a sentence and let it work the rest out. Pick wrong and you reroll; pick right and you get it first time.
+      </p>
+      <!-- BLUE DASHED FEATURE BOX -->
+      <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #eff6ff; border-radius: 8px; border: 2px dashed #3b82f6;" width="100%">
+       <tr>
+        <td style="padding: 25px;">
+         <p class="force-dark-title" style="margin: 0 0 10px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: bold; color: #1e40af; text-transform: uppercase; letter-spacing: 1px; text-align: center;">
+          What's Actually In There
+         </p>
+         <!-- 3 BULLET FEATURES -->
+         <p class="force-dark-text" style="margin: 0 0 20px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; color: #111827; text-align: left; line-height: 22px;">
+          &bull; <strong>Three Modes, Different Jobs:</strong> Standard for speed, Advanced for control, Natural Language for describing it the way you would to a person.<br/>
+          &bull; <strong>Five At Once:</strong> Batch up to five images in one go, then keep the one that worked instead of rerolling the same prompt over and over.<br/>
+          &bull; <strong>The Prompt Library:</strong> Saved prompts and presets, so the thing that worked last week is one tap away rather than something you half-remember.
+         </p>
+         <!-- CTA BUTTON -->
+         <div style="text-align: center;">
+          <a class="button" href="https://www.anione.me/en" style="display: inline-block; background-color: #3b82f6; color: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; text-decoration: none; padding: 14px 35px; border-radius: 4px;">
+           Open the Generator &rarr;
+          </a>
+         </div>
+        </td>
+       </tr>
+      </table>
+      <br/>
+      <!-- CLOSING LINE -->
+      <p class="body-text text-adaptive" style="margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #999999; text-align: center;">
+       <em>
+        Ten minutes in Advanced mode will spoil you for the quick one.
+       </em>
+      </p>
+     </td>
+    </tr>
+    <!-- FOOTER -->
+    <tr>
+     <td style="padding: 30px 20px; text-align: center; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 12px; color: #999999;">
+      <p style="margin: 0;">
+       &copy; 2026 Anione. All rights reserved.
+      </p>
+      <p style="margin: 10px 0 0 0;">
+       <a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color: #999999; text-decoration: underline;">
+        Unsubscribe
+       </a>
+      </p>
+     </td>
+    </tr>
+   </table>
+  </center>
+ </body>
+</html>
